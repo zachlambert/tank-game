@@ -7,7 +7,7 @@
 #include "draw.h"
 
 void runApp(App* app){
-	if(!initSDL(app))
+	if(initSDL(app))
         return;
 
 	while (!doInput()) // Returns 1 to exit, 0 to keep going

@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void drawScene(App* app)
 {
+    // RGBA
 	SDL_SetRenderDrawColor(app->renderer, 96, 128, 255, 255);
 	SDL_RenderClear(app->renderer);
 

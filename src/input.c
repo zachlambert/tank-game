@@ -30,10 +30,6 @@ int doInput(void)
 		{
 			case SDL_QUIT:
 				return 1;
-				break;
-
-			default:
-				break;
 		}
 	}
     return 0;
