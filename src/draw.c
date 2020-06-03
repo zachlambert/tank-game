@@ -19,31 +19,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "draw.h"
+
 #include <SDL_log.h>
+#include "entity.h"
+#include "linkedList.h"
 
-SDL_Texture* loadTexture(App* app, char* filename)
-{
-    SDL_Texture* texture;
-    SDL_LogMessage(
-        SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
-        "Loading %s", filename);
-    texture = IMG_LoadTexture(app->renderer, filename);
-    if(texture == NULL)
-    {
-        SDL_LogMessage(
-            SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
-            "Failed to load %s", filename);
-    }
-    return texture;
-}
+#define PI 3.14159
 
-void blit(App* app, SDL_Texture *texture, int x, int y)
+void blit(SDL_Renderer* renderer, SDL_Texture *texture, int x, int y)
 {
     SDL_Rect dest;
     dest.x = x;
     dest.y = y;
     SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
-    SDL_RenderCopy(app->renderer, texture, NULL, &dest);
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
     // Draw texture onto renderer at rectangle dst.
     // NULL is passed as the src rect to indicate the whole image.
 }
@@ -61,7 +50,8 @@ Pose accumulatePose(Entity* entity){
     return pose;
 }
 
-void drawEntity(App* app, Entity* entity){
+void drawEntity(SDL_Renderer* renderer, Entity* entity, SpriteData* spriteData)
+{
     Pose pose;
     if(entity->parent == NULL){
         pose = entity->pose;
@@ -69,21 +59,22 @@ void drawEntity(App* app, Entity* entity){
         pose = accumulatePose(entity);
     }
     // Todo: rotation
-    blit(app, entity->texture, (int)pose.x, (int)pose.y);
+    blit(renderer, spriteData->textures[entity->sprite],
+         (int)pose.x, (int)pose.y);
 }
 
-void drawScene(App* app)
+void drawScene(SDL_Renderer* renderer, World* world, SpriteData* spriteData)
 {
     // RGBA
-	SDL_SetRenderDrawColor(app->renderer, 0, 0, 100, 255);
-	SDL_RenderClear(app->renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 100, 255);
+	SDL_RenderClear(renderer);
 
     // Iterate through list
-    List* list = app->world->entities;
+    List* list = world->entities;
     while(list!=NULL){
-        drawEntity(app, list->data);
+        drawEntity(renderer, list->data, spriteData);
         list = list->next;
     }
 
-	SDL_RenderPresent(app->renderer);
+	SDL_RenderPresent(renderer);
 }

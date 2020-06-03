@@ -1,10 +1,11 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-#include "common.h"
+# include <SDL2/SDL.h>
+#include "world.h"
 
-SDL_Texture* loadTexture(App* app, char* filename);
-void blit(App* app, SDL_Texture *texture, int x, int y);
-void drawScene(App* app);
+SDL_Texture* loadTexture(SDL_Renderer* renderer, char* filename);
+void blit(SDL_Renderer* renderer, SDL_Texture *texture, int x, int y);
+void drawScene(SDL_Renderer* renderer, World* world, SpriteData* spriteData);
 
 #endif

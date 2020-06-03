@@ -1,8 +1,17 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "common.h"
+#include <stdbool.h>
+#include <SDL2/SDL.h>
 
-int doInput(App* app);
+typedef struct {
+    bool mouse;
+    bool w;
+    bool s;
+    bool a;
+    bool d;
+} Input;
+
+int doInput(Input* input);
 
 #endif

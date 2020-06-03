@@ -1,24 +1,6 @@
-/*
-Copyright (C) 2015-2018 Parallel Realities
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
 
 #include "input.h"
+#include <SDL2/SDL.h>
 
 void setKey(Input* input, SDL_KeyboardEvent* key, bool value){
     if(key->repeat != 0)
@@ -49,27 +31,32 @@ void setMouse(Input* input, SDL_MouseButtonEvent* button, bool value){
     }
 }
 
-int doInput(App* app)
+int doInput(Input* input)
 {
 	SDL_Event event;
-	
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)
 		{
 			case SDL_QUIT:
+                // Stopped working for some reason. Maybe because I'm using
+                // i3, where the exit is triggered by Ctrl-Shift-Key, which
+                // also triggers key press events
 				return 1;
             case SDL_KEYDOWN:
-                setKey(app->input, &event.key, true);
+                if(((SDL_KeyboardEvent*)&event.key)->keysym.scancode
+                        ==SDL_SCANCODE_ESCAPE)
+                    return 1;
+                setKey(input, &event.key, true);
                 break;
             case SDL_KEYUP:
-                setKey(app->input, &event.key, false);
+                setKey(input, &event.key, false);
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                setMouse(app->input, &event.button, true);
+                setMouse(input, &event.button, true);
                 break;
             case SDL_MOUSEBUTTONUP:
-                setMouse(app->input, &event.button, false);
+                setMouse(input, &event.button, false);
                 break;
             default:
                 break;
