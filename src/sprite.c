@@ -70,12 +70,14 @@ SDL_Texture* loadRotatingTexture(
     dest.h = size;
     float angle = 0;
 
+    printf("each is %ix%i\n", size, size);
+
     for(int i=0; i<NUM_ROTATIONS; i++){
         SDL_RenderCopyEx(
             renderer, square, NULL, &dest, angle,
             NULL, SDL_FLIP_NONE);
         dest.x += size;
-        angle += 360/NUM_ROTATIONS;
+        angle += (double)360/(double)NUM_ROTATIONS;
     }
     SDL_DestroyTexture(square);
     SDL_DestroyTexture(original);
@@ -99,7 +101,7 @@ SpriteData* initSpriteData(SDL_Renderer* renderer)
     // sprites for each rotation, and when drawing, index by
     // the quantised rotation.
 
-    const int NUM_ROTATIONS = 16;
+    const int NUM_ROTATIONS = 64;
     const int FIRST_ROTATION = SPRITE_PLAYER_BASE;
 
     SDL_Texture* player_base_texture = loadRotatingTexture(

@@ -3,6 +3,8 @@
 #include "input.h"
 #include "sprite.h"
 
+#define PI 3.14159
+
 World* initWorld(void)
 {
     // The player will be the first entity
@@ -34,15 +36,22 @@ World* initWorld(void)
 
 void updateWorld(World* world, Input* input, double dt)
 {
+    double speed = 150;
+    double angular_speed = PI;
+    Pose* player_pose = &world->player->pose;
     if(input->w && !input->s){
-        world->player->pose.y -= dt * 100;
+        player_pose->x += dt * speed * cos(player_pose->angle);
+        player_pose->y += dt * speed * sin(player_pose->angle);
     }else if(input->s && !input->w){
-        world->player->pose.y += dt * 100;
+        player_pose->x -= dt * speed * cos(player_pose->angle);
+        player_pose->y -= dt * speed * sin(player_pose->angle);
     }
     if(input->a && !input->d){
-        world->player->pose.x -= dt * 100;
+        player_pose->angle -= dt * angular_speed;
     }else if(input->d && !input->a){
-        world->player->pose.x += dt * 100;
+        player_pose->angle += dt * angular_speed;
     }
+    while(player_pose->angle<0) player_pose->angle += 2*PI;
+    while(player_pose->angle>2*PI) player_pose->angle -= 2*PI;
 }
 
