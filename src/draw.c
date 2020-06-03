@@ -37,6 +37,23 @@ void blit(SDL_Renderer* renderer, SDL_Texture *texture, int x, int y)
     // NULL is passed as the src rect to indicate the whole image.
 }
 
+void blitRegion(
+    SDL_Renderer* renderer, SDL_Texture *texture,
+    int x, int y, int index)
+{
+    SDL_Rect src = {0, 0, 0, 0};
+    SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
+    src.w = src.h;
+    src.x = src.w * index;
+    SDL_Rect dest = { 
+        x,
+        y,
+        src.w,
+        src.h
+    };
+    SDL_RenderCopy(renderer, texture, &src, &dest);
+}
+
 Pose accumulatePose(Entity* entity){
     Pose pose = entity->pose; // Copy
     while(entity->parent != NULL){
@@ -58,9 +75,18 @@ void drawEntity(SDL_Renderer* renderer, Entity* entity, SpriteData* spriteData)
     }else{
         pose = accumulatePose(entity);
     }
-    // Todo: rotation
-    blit(renderer, spriteData->textures[entity->sprite],
-         (int)pose.x, (int)pose.y);
+    if(entity->sprite<spriteData->FIRST_ROTATION){
+        blit(
+            renderer, spriteData->textures[entity->sprite],
+            (int)pose.x, (int)pose.y);
+    }else{
+        int index = (int)round(pose.angle/(2*PI) * spriteData->NUM_ROTATIONS);
+        if(index==spriteData->NUM_ROTATIONS)
+            index = 0;
+        blitRegion(
+            renderer, spriteData->textures[entity->sprite],
+            (int)pose.x, (int)pose.y, index);
+    }
 }
 
 void drawScene(SDL_Renderer* renderer, World* world, SpriteData* spriteData)

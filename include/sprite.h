@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-typedef enum Sprite {
+typedef enum {
     SPRITE_PLAYER_BASE,
     SPRITE_PLAYER_TURRET,
     SPRITE_COUNT // Use this to get the number of sprites

@@ -2,7 +2,6 @@
 #define INPUT_H
 
 #include <stdbool.h>
-#include <SDL2/SDL.h>
 
 typedef struct {
     bool mouse;

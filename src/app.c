@@ -11,7 +11,6 @@ int initApp(App* app)
 {
 	int rendererFlags, windowFlags;
 
-	rendererFlags = SDL_RENDERER_ACCELERATED;
 	windowFlags = 0;
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -33,6 +32,11 @@ int initApp(App* app)
 	}
 
     // Create renderer
+
+	rendererFlags = SDL_RENDERER_ACCELERATED
+                    | SDL_RENDERER_PRESENTVSYNC
+                    | SDL_RENDERER_TARGETTEXTURE;
+
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	app->renderer = SDL_CreateRenderer(app->window, -1, rendererFlags);
 	if (!app->renderer)

@@ -2,6 +2,8 @@
 #include "sprite.h"
 #include <SDL_image.h>
 
+#define PI 3.14159
+
 SDL_Texture* loadTexture(SDL_Renderer* renderer, char* filename)
 {
     SDL_Texture* texture;
@@ -18,10 +20,67 @@ SDL_Texture* loadTexture(SDL_Renderer* renderer, char* filename)
     return texture;
 }
 
-SDL_Texture* loadPreRotatedTexture(SDL_Renderer* renderer, char* filename)
+SDL_Texture* loadRotatingTexture(
+    SDL_Renderer* renderer, char* filename, const int NUM_ROTATIONS)
 {
-    //todo
-    return 0;
+    // Load the original texture
+    SDL_Rect src;
+    Uint32 format;
+    SDL_Texture* original = loadTexture(renderer, filename);
+    if(original == 0)
+        return 0;
+    // Get the size with SDL_QueryTexture
+    SDL_QueryTexture(original, &format, NULL, &src.w, &src.h);
+
+    // Find the bounding square size
+    int size = src.w>src.h ? src.w : src.h;
+    // Create a dest rect to centre the original on the square
+    SDL_Rect dest = { (size-src.w)/2, (size-src.h)/2, src.w, src.h };
+    // Create a square rect to write onto
+    // It must have the SDL_TEXTUREACCESS_TARGET access 
+    SDL_Texture* square = SDL_CreateTexture(
+        renderer, format,
+        SDL_TEXTUREACCESS_TARGET, size, size);
+    // Set render target to this new texture
+    SDL_SetRenderTarget(renderer, square);
+    // Set TEXTURE blend mode to SDL_BLENDMODE_BLEND to support alpha
+    SDL_SetTextureBlendMode(square, SDL_BLENDMODE_BLEND);
+    // Set the renderer draw color to be transparent
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    // Clear the texture with this colour, setting it to a transparent
+    // texture
+	SDL_RenderClear(renderer);
+    // Copy the original image onto the render target (square)
+    SDL_RenderCopy(renderer, original, &src, &dest);
+
+    SDL_Texture* new_texture = SDL_CreateTexture(
+        renderer, format, SDL_TEXTUREACCESS_TARGET,
+        size*NUM_ROTATIONS, size);
+
+    // Do the same steps as before to clear this texture and
+    // set it up for writing to
+    SDL_SetRenderTarget(renderer, new_texture);
+    SDL_SetTextureBlendMode(new_texture, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_RenderClear(renderer);
+
+    dest.x = 0;
+    dest.y = 0;
+    dest.w = size;
+    dest.h = size;
+    float angle = 0;
+
+    for(int i=0; i<NUM_ROTATIONS; i++){
+        SDL_RenderCopyEx(
+            renderer, square, NULL, &dest, angle,
+            NULL, SDL_FLIP_NONE);
+        dest.x += size;
+        angle += 360/NUM_ROTATIONS;
+    }
+    SDL_DestroyTexture(square);
+    SDL_DestroyTexture(original);
+    SDL_SetRenderTarget(renderer, NULL);
+    return new_texture; //new_texture;
 }
 
 SpriteData* initSpriteData(SDL_Renderer* renderer)
@@ -43,12 +102,12 @@ SpriteData* initSpriteData(SDL_Renderer* renderer)
     const int NUM_ROTATIONS = 16;
     const int FIRST_ROTATION = SPRITE_PLAYER_BASE;
 
-    SDL_Texture* player_base_texture = loadTexture(
-        renderer, "graphics/player_base.png");
+    SDL_Texture* player_base_texture = loadRotatingTexture(
+        renderer, "graphics/player_base.png", NUM_ROTATIONS);
     textures[SPRITE_PLAYER_BASE] = player_base_texture;
 
-    SDL_Texture* player_turret_texture = loadTexture(
-        renderer, "graphics/player_turret.png");
+    SDL_Texture* player_turret_texture = loadRotatingTexture(
+        renderer, "graphics/player_turret.png", NUM_ROTATIONS);
     textures[SPRITE_PLAYER_TURRET] = player_turret_texture;
 
     // In order to assign memory to a struct with const elements,
