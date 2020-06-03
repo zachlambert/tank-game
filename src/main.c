@@ -29,9 +29,8 @@ void runApp(App* app){
         return;
 
     Entity* player = app->world->player;
-	while (!doInput()) // Returns 1 to exit, 0 to keep going
+	while (!doInput(app)) // Returns 1 to exit, 0 to keep going
 	{
-        blit(app, player->texture, player->x, player->y);
 		drawScene(app);
 		SDL_Delay(16); // Wait a number of milliseconds
 	}

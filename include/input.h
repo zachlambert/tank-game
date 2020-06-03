@@ -3,6 +3,6 @@
 
 #include "common.h"
 
-int doInput(void);
+int doInput(App* app);
 
 #endif

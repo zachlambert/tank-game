@@ -20,7 +20,36 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "input.h"
 
-int doInput(void)
+void setKey(Input* input, SDL_KeyboardEvent* key, int value){
+    if(key->repeat != 0)
+        return;
+    switch(key->keysym.scancode)
+    {
+        case SDL_SCANCODE_W:
+            input->w = value;
+            break;
+        case SDL_SCANCODE_S:
+            input->s = value;
+            break;
+        case SDL_SCANCODE_A:
+            input->a = value;
+            break;
+        case SDL_SCANCODE_D:
+            input->d = value;
+            break;
+        default:
+            break;
+    }
+}
+
+void setMouse(Input* input, SDL_MouseButtonEvent* button, int value){
+    if(button->button == SDL_BUTTON_LEFT)
+    {
+        input->mouse = value;
+    }
+}
+
+int doInput(App* app)
 {
 	SDL_Event event;
 	
@@ -30,6 +59,20 @@ int doInput(void)
 		{
 			case SDL_QUIT:
 				return 1;
+            case SDL_KEYDOWN:
+                setKey(app->input, &event.key, 1);
+                break;
+            case SDL_KEYUP:
+                setKey(app->input, &event.key, 1);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                setMouse(app->input, &event.button, 1);
+                break;
+            case SDL_MOUSEBUTTONUP:
+                setMouse(app->input, &event.button, 0);
+                break;
+            default:
+                break;
 		}
 	}
     return 0;

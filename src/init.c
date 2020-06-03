@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "init.h"
-#include <SDL_image.h>
 
 int initSDL(App* app)
 {
@@ -65,5 +64,10 @@ void cleanup(App* app)
 {
 	SDL_DestroyRenderer(app->renderer);
 	SDL_DestroyWindow(app->window);
+
+    // Could unallocate the memory for the other objects within App,
+    // but it doesn't really matter since we are at the end of the
+    // program anyway.
+
 	SDL_Quit();
 }
