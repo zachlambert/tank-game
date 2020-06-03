@@ -5,9 +5,15 @@
 #include <stdbool.h>
 
 typedef struct {
-    int x;
-    int y;
+    double x;
+    double y;
+    double angle;
+} Pose;
+
+typedef struct Entity{
+    Pose pose;
     SDL_Texture* texture;
+    struct Entity* parent; // For doing relative positions
 } Entity;
 
 typedef struct {

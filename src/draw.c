@@ -48,8 +48,28 @@ void blit(App* app, SDL_Texture *texture, int x, int y)
     // NULL is passed as the src rect to indicate the whole image.
 }
 
+Pose accumulatePose(Entity* entity){
+    Pose pose = entity->pose; // Copy
+    while(entity->parent != NULL){
+        entity = entity->parent;
+        pose.x += entity->pose.x;
+        pose.y += entity->pose.y;
+        pose.angle += entity->pose.angle;
+    }
+    while(pose.angle<0) pose.angle+=2*PI;
+    while(pose.angle>2*PI) pose.angle-=2*PI;
+    return pose;
+}
+
 void drawEntity(App* app, Entity* entity){
-    blit(app, entity->texture, entity->x, entity->y);
+    Pose pose;
+    if(entity->parent == NULL){
+        pose = entity->pose;
+    }else{
+        pose = accumulatePose(entity);
+    }
+    // Todo: rotation
+    blit(app, entity->texture, (int)pose.x, (int)pose.y);
 }
 
 void drawScene(App* app)

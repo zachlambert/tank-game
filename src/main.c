@@ -8,9 +8,9 @@
 
 int initWorld(App* app){
     Entity* player = calloc(1, sizeof(Entity));
-    player->x = 100;
-    player->y = 100;
-    player->texture = loadTexture(app, "graphics/player.png");
+    player->pose.x = 100;
+    player->pose.y = 100;
+    player->texture = loadTexture(app, "graphics/player_turret.png");
     if(player->texture == NULL)
         return 1;
 
@@ -21,6 +21,24 @@ int initWorld(App* app){
     return 0;
 }
 
+void updateWorld(App* app, double dt)
+{
+    World* world = app->world;
+    Input* input = app->input;
+
+    if(input->w && !input->s){
+        world->player->pose.y -= dt * 100;
+    }else if(input->s && !input->w){
+        world->player->pose.y += dt * 100;
+    }
+
+    if(input->a && !input->d){
+        world->player->pose.x -= dt * 100;
+    }else if(input->d && !input->a){
+        world->player->pose.x += dt * 100;
+    }
+}
+
 void runApp(App* app){
 	if(initSDL(app))
         return;
@@ -28,11 +46,24 @@ void runApp(App* app){
     if(initWorld(app))
         return;
 
+    Input* input = calloc(1, sizeof(Input));
+    app->input = input;
+
     Entity* player = app->world->player;
+
+    long now = SDL_GetPerformanceCounter();
+    long prev = 0;
+    double dt = 0;
+    double timeScaleFactor = 1/(double)SDL_GetPerformanceFrequency();
 	while (!doInput(app)) // Returns 1 to exit, 0 to keep going
 	{
+        prev = now;
+        now = SDL_GetPerformanceCounter();
+        dt = (double)(now-prev) * timeScaleFactor;
+        updateWorld(app, dt);
 		drawScene(app);
-		SDL_Delay(16); // Wait a number of milliseconds
+		SDL_Delay(16); // Wait an arbitrary(ish) number of milliseconds
+        // All this does it cap the framerate at ~60
 	}
 }
 
