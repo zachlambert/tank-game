@@ -11,6 +11,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 
+#include "linkedList.h"
 #include "structs.h"
 
 #define PI 3.14159

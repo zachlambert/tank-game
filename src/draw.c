@@ -78,7 +78,12 @@ void drawScene(App* app)
 	SDL_SetRenderDrawColor(app->renderer, 0, 0, 100, 255);
 	SDL_RenderClear(app->renderer);
 
-    drawEntity(app, app->world->player);
+    // Iterate through list
+    List* list = app->world->entities;
+    while(list!=NULL){
+        drawEntity(app, list->data);
+        list = list->next;
+    }
 
 	SDL_RenderPresent(app->renderer);
 }

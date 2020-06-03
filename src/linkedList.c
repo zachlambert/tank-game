@@ -1,16 +1,17 @@
 
 #include "linkedList.h"
+#include <stdio.h>
 
-void insertList(Node** list, void* data)
+void insertList(List** list, void* data)
 {
     // Insert at the start, it's most efficient
-    Node* new_node = malloc(sizeof(Node));
+    List* new_node = malloc(sizeof(List));
     new_node->data = data;
     new_node->next = *list;
     *list = new_node;
 }
 
-void deleteList(Node** list, Node* to_delete)
+void deleteList(List** list, List* to_delete)
 {
     // First check if the first item is to be deleted
     if(*list == to_delete)
@@ -20,7 +21,7 @@ void deleteList(Node** list, Node* to_delete)
         return;
     }
     // Else, iterate through the list
-    Node* pred = *list;
+    List* pred = *list;
     while(pred!=NULL && pred->next !=NULL && pred->next != to_delete){
         pred = pred->next;
     }

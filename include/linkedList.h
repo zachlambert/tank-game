@@ -4,12 +4,12 @@
 #include <stdlib.h>
 
 // Singly linked, generic (uses void pointers)
-typedef struct Node{
+typedef struct List{
     void* data;
-    struct Node* next;
-} Node;
+    struct List* next;
+} List;
 
-void insertList(Node** list, void* data);
-void deleteList(Node** list, Node* to_delete);
+void insertList(List** list, void* data);
+void deleteList(List** list, List* to_delete);
 
 #endif

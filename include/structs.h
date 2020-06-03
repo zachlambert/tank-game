@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include "linkedList.h"
 
 typedef struct {
     double x;
@@ -18,6 +19,7 @@ typedef struct Entity{
 
 typedef struct {
     Entity* player;
+    List* entities;
 } World;
 
 typedef struct {
