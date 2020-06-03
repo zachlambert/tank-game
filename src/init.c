@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "init.h"
+#include <SDL_image.h>
 
 int initSDL(App* app)
 {
@@ -53,6 +54,9 @@ int initSDL(App* app)
 		printf("Failed to create renderer: %s\n", SDL_GetError());
 		return 1;
 	}
+
+    // Initialise images
+    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
 
     return 0;
 }
