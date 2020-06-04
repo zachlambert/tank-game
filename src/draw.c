@@ -97,11 +97,15 @@ void drawScene(SDL_Renderer* renderer, World* world, SpriteData* spriteData)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 100, 255);
 	SDL_RenderClear(renderer);
 
-    // Iterate through list
-    List* list = world->entities;
-    while(list!=NULL){
-        drawEntity(renderer, list->data, spriteData);
-        list = list->next;
+    // Iterate through layers
+    List** stop = world->layers + LAYER_COUNT;
+    List* list;
+    for(List** layer = world->layers; layer<stop; layer++){
+        list = *layer;
+        while(list!=NULL){
+            drawEntity(renderer, list->data, spriteData);
+            list = list->next;
+        }
     }
 
 	SDL_RenderPresent(renderer);
