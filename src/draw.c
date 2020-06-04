@@ -32,6 +32,8 @@ void blit(SDL_Renderer* renderer, SDL_Texture *texture, int x, int y)
     dest.x = x;
     dest.y = y;
     SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+    dest.x -= dest.w;
+    dest.y -= dest.h;
     SDL_RenderCopy(renderer, texture, NULL, &dest);
     // Draw texture onto renderer at rectangle dst.
     // NULL is passed as the src rect to indicate the whole image.
@@ -46,8 +48,8 @@ void blitRegion(
     src.w = src.h;
     src.x = src.w * index;
     SDL_Rect dest = { 
-        x,
-        y,
+        x-src.w/2,
+        y-src.h/2,
         src.w,
         src.h
     };
