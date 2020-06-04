@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 
 typedef enum {
+    SPRITE_NONE, // Can leave Sprite=0 to indicate no sprite
     SPRITE_PLAYER_BASE,
     SPRITE_PLAYER_TURRET,
     SPRITE_COUNT // Use this to get the number of sprites

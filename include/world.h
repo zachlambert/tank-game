@@ -5,20 +5,12 @@
 #include "linkedList.h"
 #include "input.h"
 
-typedef enum {
-    LAYER_ZERO, // Can rename if I want
-    LAYER_ONE,
-    LAYER_TWO,
-    LAYER_COUNT
-} Layer;
-
 typedef struct {
-    Entity* player;
-    List** layers;
+    Entity* entities;
+    Entity* player; // Specific entity corresponding to player
 } World;
 
 World* initWorld(void);
-void insertEntity(World* world, Layer layer, Entity* entity);
 void updateWorld(World* world, Input* input, double dt);
 
 #endif

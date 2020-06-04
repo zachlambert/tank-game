@@ -1,6 +1,7 @@
 
 #include "pose.h"
 #include <math.h>
+#include "mathDefines.h"
 
 Pose addPose(Pose parent, Pose child)
 {
@@ -16,6 +17,12 @@ Pose addPose(Pose parent, Pose child)
     result.x += parent.x;
     result.y += parent.y;
     result.angle += parent.angle;
+    if(result.angle<0){
+        result.angle += 2*PI;
+    }else if(result.angle>2*PI){
+        result.angle -= 2*PI;
+    }
+
 
     return result;
 }

@@ -1,76 +1,36 @@
 
 #include "entity.h"
-#include "mathDefines.h"
 
-void updateTurret(Entity* entity, double target, double dt)
+// Need the address of the Entity*, so you can re-write it
+Entity* insertEntity(Entity** entities, EntityData data)
 {
-    double absolute =
-        entity->parent->pose.angle
-        + entity->pose.angle;
-    while(absolute<0) absolute += 2*PI;
-    while(absolute>2*PI) absolute -= 2*PI;
+    Entity* newEntity = calloc(1, sizeof(Entity));
+    newEntity->data = data;
+    newEntity->next = *entities;
+    // Used calloc, so other pointers default to 0
+    *entities = newEntity;
+    return newEntity;
+}
 
-    // Make angleDif go from -PI to PI
-    double dif = target - absolute;
-    while(dif<-PI) dif += 2*PI;
-    while(dif>PI) dif -= 2*PI;
+Entity* insertChild(Entity* parent, EntityData childData)
+{
+    return insertEntity(&(parent->children), childData);
+}
 
-    double change = dt * entity->data.turret.rotateSpeed;
-    if(dif < 0) change = -change;
-
-    if(fabs(dif) < fabs(change)){
-        entity->pose.angle = target - entity->parent->pose.angle;
-        if(entity->pose.angle < 0)
-            entity->pose.angle += 2*PI;
+// Also deletes children
+void deleteEntity(Entity** entities, Entity* entity)
+{
+    if(entity->prev == NULL){ // Must be the first item
+        *entities = entity->next;
     }else{
-        entity->pose.angle += change;
+        entity->prev->next = entity->next;
     }
-}
-
-void updateTank(Entity* entity,
-                double linearVelocity,
-                double angularVelocity,
-                double dt)
-{
-    entity->pose.x += dt * linearVelocity * cos(entity->pose.angle);
-    entity->pose.y += dt * linearVelocity * sin(entity->pose.angle);
-    entity->pose.angle += dt * angularVelocity;
-    while(entity->pose.angle<0) entity->pose.angle += 2*PI;
-    while(entity->pose.angle>2*PI) entity->pose.angle -= 2*PI;
-}
-
-int entityUpdatePlayerTurret(Entity* entity, Input* input, double dt)
-{
-    int mx, my;
-    SDL_GetMouseState(&mx, &my);
-
-    Pose absolute = addPose(entity->parent->pose, entity->pose);
-    double dx = (double)mx - absolute.x;
-    double dy = (double)my - absolute.y;
-    double angleToMouse = atan2(dy, dx);
-    updateTurret(entity, angleToMouse, dt);
-    return 0;
-}
-
-int entityUpdatePlayerTank(Entity* entity, Input* input, double dt)
-{
-    double linearVelocity = 0;
-    double angularVelocity = 0;
-
-    if(input->w && !input->s){
-        linearVelocity = entity->data.tank.forwardSpeed;
-    }else if(input->s && !input->w){
-        linearVelocity = - entity->data.tank.backwardSpeed;
+    Entity* current = entity->children;
+    Entity* next;
+    while(current){
+        next = current->next;
+        free(current);
+        current = next;
     }
-    if(input->a && !input->d){
-        angularVelocity = -entity->data.tank.rotateSpeed;
-    }else if(input->d && !input->a){
-        angularVelocity = entity->data.tank.rotateSpeed;
-    }
-    if(linearVelocity<0) angularVelocity = -angularVelocity;
-
-    updateTank(entity, linearVelocity, angularVelocity, dt);
-    return 0;
+    free(entity);
 }
-
-

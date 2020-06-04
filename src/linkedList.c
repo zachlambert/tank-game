@@ -14,6 +14,9 @@ void insertList(List** list, void* data)
 
 void deleteList(List** list, List* to_delete)
 {
+    // Must delete the data prior to this
+    // Cannot delete data here, since the type needs
+    // to be known
     if(to_delete->prev == NULL){
         *list = to_delete->next;
     }else{

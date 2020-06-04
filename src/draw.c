@@ -57,58 +57,57 @@ void blitRegion(
     SDL_RenderCopy(renderer, texture, &src, &dest);
 }
 
-Pose accumulatePose(Entity* entity){
-    Pose pose = entity->pose; // Copy
-    while(entity->parent != NULL){
-        entity = entity->parent;
-        pose = addPose(entity->pose, pose); 
-    }
-    while(pose.angle<0) pose.angle+=2*PI;
-    while(pose.angle>2*PI) pose.angle-=2*PI;
-    return pose;
-}
-
-void drawEntity(
+void drawSprite(
         SDL_Renderer* renderer,
-        Entity* entity,
+        Pose pose,
+        Sprite sprite,
         SpriteData* spriteData)
 {
-    Pose pose;
-    if(entity->parent == NULL){
-        pose = entity->pose;
-    }else{
-        pose = accumulatePose(entity);
-    }
-    if(entity->sprite<spriteData->FIRST_ROTATION){
+    if(sprite<spriteData->FIRST_ROTATION){
         blit(
-            renderer, spriteData->textures[entity->sprite],
+            renderer, spriteData->textures[sprite],
             (int)pose.x, (int)pose.y);
     }else{
         int index = (int)round(pose.angle/(2*PI) * spriteData->NUM_ROTATIONS);
         if(index==spriteData->NUM_ROTATIONS)
             index = 0;
         blitRegion(
-            renderer, spriteData->textures[entity->sprite],
+            renderer, spriteData->textures[sprite],
             (int)pose.x, (int)pose.y, index);
     }
 }
 
-void drawScene(SDL_Renderer* renderer, World* world, SpriteData* spriteData)
+void drawEntities(
+    SDL_Renderer* renderer,
+    Pose parentPose,
+    Entity* entity,
+    SpriteData* spriteData)
+{
+    Pose pose;
+    while(entity){
+        pose = addPose(parentPose, entity->data.pose);
+        drawSprite(renderer, pose, entity->data.sprite, spriteData);
+        if(entity->children){
+            drawEntities(renderer, pose, entity->children, spriteData);
+            // Won't be many layers, recursion probably fine.
+            // Can change later if necessary
+        }
+        entity = entity->next;
+    }
+}
+
+void drawScene(
+    SDL_Renderer* renderer,
+    World* world,
+    SpriteData* spriteData)
 {
     // RGBA
 	SDL_SetRenderDrawColor(renderer, 0, 0, 100, 255);
 	SDL_RenderClear(renderer);
 
-    // Iterate through layers
-    List** stop = world->layers + LAYER_COUNT;
-    List* list;
-    for(List** layer = world->layers; layer<stop; layer++){
-        list = *layer;
-        while(list!=NULL){
-            drawEntity(renderer, list->data, spriteData);
-            list = list->next;
-        }
-    }
+    // Use basePose to do camera stuff later
+    Pose basePose = { 0, 0, 0 };
+    drawEntities(renderer, basePose, world->entities, spriteData);
 
 	SDL_RenderPresent(renderer);
 }

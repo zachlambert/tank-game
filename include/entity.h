@@ -1,37 +1,24 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "sprite.h"
-#include "input.h"
-#include "pose.h"
+#include "entityData.h"
 
-struct EntityDataTank {
-    double forwardSpeed;
-    double backwardSpeed;
-    double rotateSpeed;
-};
-struct EntityDataTurret {
-    double rotateSpeed;
-};
-
-typedef union {
-    struct EntityDataTank tank;
-    struct EntityDataTurret turret;
-} EntityData;
-
-// Forward declare to use in function pointer
-struct Entity;
-typedef int (*EntityUpdate)(struct Entity*, Input*, double);
-
+// Entity itself is a node of a doubly-linked list
+// Each entity can also have children, also a doubly-linked list
 typedef struct Entity{
-    Pose pose; // Position and rotation within reference frame
-    Sprite sprite;
-    struct Entity* parent; // Reference frame
-    EntityUpdate update;
+    // Tree items
+    struct Entity* prev;
+    struct Entity* next;
+    struct Entity* children;
+    // Data
     EntityData data;
+    // The data is completely static, so you don't have to
+    // worry about allocating memory to it, or freeing it with
+    // the entity
 } Entity;
 
-int entityUpdatePlayerTurret(Entity*, Input*, double);
-int entityUpdatePlayerTank(Entity*, Input*, double);
+Entity* insertEntity(Entity** entities, EntityData data);
+Entity* insertChild(Entity* parent, EntityData childData);
+void deleteEntity(Entity** entities, Entity* entity);
 
 #endif
