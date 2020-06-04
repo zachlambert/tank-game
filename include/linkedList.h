@@ -3,10 +3,11 @@
 
 #include <stdlib.h>
 
-// Singly linked, generic (uses void pointers)
+// Doubly linked, generic (uses void pointers)
 typedef struct List{
     void* data;
     struct List* next;
+    struct List* prev;
 } List;
 
 void insertList(List** list, void* data);

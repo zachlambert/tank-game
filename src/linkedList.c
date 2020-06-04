@@ -8,28 +8,16 @@ void insertList(List** list, void* data)
     List* new_node = malloc(sizeof(List));
     new_node->data = data;
     new_node->next = *list;
+    new_node->prev = 0; // Used malloc, so not guaranteed to be empty
     *list = new_node;
 }
 
 void deleteList(List** list, List* to_delete)
 {
-    // First check if the first item is to be deleted
-    if(*list == to_delete)
-    {
+    if(to_delete->prev == NULL){
         *list = to_delete->next;
-        free(to_delete);
-        return;
+    }else{
+        to_delete->prev->next = to_delete->next;
     }
-    // Else, iterate through the list
-    List* pred = *list;
-    while(pred!=NULL && pred->next !=NULL && pred->next != to_delete){
-        pred = pred->next;
-    }
-    if(pred==NULL)
-        return; // Gave an empty list, do nothing
-    if(pred->next==NULL)
-        return; // Not present, do nothing
-    // Connect pred and to_delete->next, then free to_delete
-    pred->next = to_delete->next;
     free(to_delete);
 }
