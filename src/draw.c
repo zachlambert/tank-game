@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <SDL_log.h>
 #include "entity.h"
 #include "linkedList.h"
+#include "pose.h"
 
 #define PI 3.14159
 
@@ -60,16 +61,17 @@ Pose accumulatePose(Entity* entity){
     Pose pose = entity->pose; // Copy
     while(entity->parent != NULL){
         entity = entity->parent;
-        pose.x += entity->pose.x;
-        pose.y += entity->pose.y;
-        pose.angle += entity->pose.angle;
+        pose = addPose(entity->pose, pose); 
     }
     while(pose.angle<0) pose.angle+=2*PI;
     while(pose.angle>2*PI) pose.angle-=2*PI;
     return pose;
 }
 
-void drawEntity(SDL_Renderer* renderer, Entity* entity, SpriteData* spriteData)
+void drawEntity(
+        SDL_Renderer* renderer,
+        Entity* entity,
+        SpriteData* spriteData)
 {
     Pose pose;
     if(entity->parent == NULL){

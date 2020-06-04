@@ -43,8 +43,10 @@ int entityUpdatePlayerTurret(Entity* entity, Input* input, double dt)
 {
     int mx, my;
     SDL_GetMouseState(&mx, &my);
-    double dx = (double)mx - entity->parent->pose.x;
-    double dy = (double)my - entity->parent->pose.y;
+
+    Pose absolute = addPose(entity->parent->pose, entity->pose);
+    double dx = (double)mx - absolute.x;
+    double dy = (double)my - absolute.y;
     double angleToMouse = atan2(dy, dx);
     updateTurret(entity, angleToMouse, dt);
     return 0;

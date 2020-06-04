@@ -70,8 +70,6 @@ SDL_Texture* loadRotatingTexture(
     dest.h = size;
     float angle = 0;
 
-    printf("each is %ix%i\n", size, size);
-
     for(int i=0; i<NUM_ROTATIONS; i++){
         SDL_RenderCopyEx(
             renderer, square, NULL, &dest, angle,

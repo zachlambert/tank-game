@@ -29,10 +29,8 @@ World* initWorld(void)
     player->data.tank.rotateSpeed = 2.5;
 
     insertEntity(world, LAYER_ZERO, player);
-    world->player = player; // Also store a pointer to the player
-
-    // Add another entity, for the player turret
     Entity* turret = calloc(1, sizeof(Entity));
+    turret->pose.x = 0;
     turret->sprite = SPRITE_PLAYER_TURRET;
     turret->parent = player;
     turret->update = entityUpdatePlayerTurret;

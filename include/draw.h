@@ -5,7 +5,6 @@
 #include "world.h"
 
 SDL_Texture* loadTexture(SDL_Renderer* renderer, char* filename);
-void blit(SDL_Renderer* renderer, SDL_Texture *texture, int x, int y);
 void drawScene(SDL_Renderer* renderer, World* world, SpriteData* spriteData);
 
 #endif

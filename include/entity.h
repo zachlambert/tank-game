@@ -3,6 +3,7 @@
 
 #include "sprite.h"
 #include "input.h"
+#include "pose.h"
 
 struct EntityDataTank {
     double forwardSpeed;
@@ -18,20 +19,14 @@ typedef union {
     struct EntityDataTurret turret;
 } EntityData;
 
-typedef struct {
-    double x;
-    double y;
-    double angle;
-} Pose;
-
 // Forward declare to use in function pointer
 struct Entity;
 typedef int (*EntityUpdate)(struct Entity*, Input*, double);
 
 typedef struct Entity{
-    Pose pose;
+    Pose pose; // Position and rotation within reference frame
     Sprite sprite;
-    struct Entity* parent; // For doing relative positions
+    struct Entity* parent; // Reference frame
     EntityUpdate update;
     EntityData data;
 } Entity;
