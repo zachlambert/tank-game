@@ -1,12 +1,12 @@
 
 #include "entityUpdate.h"
+#include <stdbool.h>
 #include "mathDefines.h"
 
 void updateTank(
     Entity* tank,
     double linearVelocity,
     double angularVelocity,
-    double targetX, double targetY,
     double dt)
 {
     // Update tank pose
@@ -16,7 +16,13 @@ void updateTank(
     tank->data.pose.angle += dt * angularVelocity;
     while(tank->data.pose.angle<0) tank->data.pose.angle += 2*PI;
     while(tank->data.pose.angle>2*PI) tank->data.pose.angle -= 2*PI;
+}
 
+void updateTurret(
+    Entity* tank,
+    double targetX, double targetY,
+    double dt)
+{
     // Update turret angle
 
     Entity* turret = tank->children;
@@ -53,23 +59,30 @@ int entityUpdatePlayer(Entity* player, Input* input, double dt)
     }else if(input->s && !input->w){
         linearVelocity = - player->data.tank.backwardSpeed;
     }
-    if(input->a && !input->d){
-        angularVelocity = -player->data.tank.rotateSpeed;
-    }else if(input->d && !input->a){
-        angularVelocity = player->data.tank.rotateSpeed;
+    if(linearVelocity != 0){
+        if(input->a && !input->d){
+            angularVelocity = -player->data.tank.rotateSpeed;
+        }else if(input->d && !input->a){
+            angularVelocity = player->data.tank.rotateSpeed;
+        }
+        if(linearVelocity<0) angularVelocity = -angularVelocity;
     }
-    if(linearVelocity<0) angularVelocity = -angularVelocity;
 
     int mx, my;
     SDL_GetMouseState(&mx, &my);
+    updateTank(player, linearVelocity, angularVelocity, dt);
+    updateTurret(player, (double)mx, (double)my, dt);
+    return 0;
+}
+
+int entityUpdateDummy(Entity* entity, Input* input, double dt)
+{
     updateTank(
-        player,
-        linearVelocity,
-        angularVelocity,
-        (double)mx, (double)my,
+        entity,
+        entity->data.tank.forwardSpeed,
+        entity->data.tank.rotateSpeed,
         dt
     );
-
     return 0;
 }
 

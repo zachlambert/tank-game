@@ -5,5 +5,6 @@
 #include "input.h"
 
 int entityUpdatePlayer(Entity*, Input*, double);
+int entityUpdateDummy(Entity*, Input*, double);
 
 #endif

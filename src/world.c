@@ -18,33 +18,24 @@ World* initWorld(void)
     player.pose.y = 300;
     player.sprite = SPRITE_PLAYER_BASE;
     player.update = entityUpdatePlayer;
-    player.tank.forwardSpeed = 300;
-    player.tank.backwardSpeed = 100;
-    player.tank.rotateSpeed = 2.5;
+    player.tank.forwardSpeed = 400;
+    player.tank.backwardSpeed = 400;
+    player.tank.rotateSpeed = 4;
 
-    Entity* playerEntity = insertEntity(&(world->entities), player);
+    Entity* entity = insertEntity(&(world->entities), player);
 
     EntityData turret;
     turret.pose.x = 0;
     turret.sprite = SPRITE_PLAYER_TURRET;
     turret.turret.rotateSpeed = 2.5;
 
-    insertChild(playerEntity, turret);
+    insertChild(entity, turret);
 
-    // See what happens if I create some more players
-    player.pose.x = 600;
-    player.tank.forwardSpeed = 1000;
-    player.tank.rotateSpeed = 10;
-    playerEntity = insertEntity(&world->entities, player);
-    insertChild(playerEntity, turret);
-
-    player.pose.x = 200;
-    player.pose.y = 400;
-    player.tank.forwardSpeed = 100;
-    player.tank.rotateSpeed = 20;
-    playerEntity = insertEntity(&world->entities, player);
-    turret.turret.rotateSpeed = 10;
-    insertChild(playerEntity, turret);
+    // Create a dummy tank, re-use data
+    player.pose.x = 300;
+    player.update = entityUpdateDummy;
+    entity = insertEntity(&world->entities, player);
+    insertChild(entity, turret);
 
     return world;
 }
