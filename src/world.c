@@ -18,16 +18,14 @@ World* initWorld(void)
     player.pose.y = 300;
     player.sprite = SPRITE_PLAYER_BASE;
     player.update = entityUpdatePlayer;
-    player.tank.forwardSpeed = 400;
-    player.tank.backwardSpeed = 400;
-    player.tank.rotateSpeed = 4;
+    player.tank.speed = 400;
 
     Entity* entity = insertEntity(&(world->entities), player);
 
     EntityData turret;
     turret.pose.x = 0;
     turret.sprite = SPRITE_PLAYER_TURRET;
-    turret.turret.rotateSpeed = 2.5;
+    turret.turret.rotateSpeed = 8;
 
     insertChild(entity, turret);
 

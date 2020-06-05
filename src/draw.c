@@ -69,6 +69,7 @@ void drawSprite(
             (int)pose.x, (int)pose.y);
     }else{
         int index = (int)round(pose.angle/(2*PI) * spriteData->NUM_ROTATIONS);
+        if(index<0) index+= spriteData->NUM_ROTATIONS;
         if(index==spriteData->NUM_ROTATIONS)
             index = 0;
         blitRegion(
@@ -79,16 +80,13 @@ void drawSprite(
 
 void drawEntities(
     SDL_Renderer* renderer,
-    Pose parentPose,
     Entity* entity,
     SpriteData* spriteData)
 {
-    Pose pose;
     while(entity){
-        pose = addPose(parentPose, entity->data.pose);
-        drawSprite(renderer, pose, entity->data.sprite, spriteData);
+        drawSprite(renderer, entity->data.pose, entity->data.sprite, spriteData);
         if(entity->children){
-            drawEntities(renderer, pose, entity->children, spriteData);
+            drawEntities(renderer, entity->children, spriteData);
             // Won't be many layers, recursion probably fine.
             // Can change later if necessary
         }
@@ -105,9 +103,7 @@ void drawScene(
 	SDL_SetRenderDrawColor(renderer, 0, 0, 100, 255);
 	SDL_RenderClear(renderer);
 
-    // Use basePose to do camera stuff later
-    Pose basePose = { 0, 0, 0 };
-    drawEntities(renderer, basePose, world->entities, spriteData);
+    drawEntities(renderer, world->entities, spriteData);
 
 	SDL_RenderPresent(renderer);
 }

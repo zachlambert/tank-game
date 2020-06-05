@@ -5,84 +5,78 @@
 
 void updateTank(
     Entity* tank,
-    double linearVelocity,
-    double angularVelocity,
+    double vx,
+    double vy,
     double dt)
 {
     // Update tank pose
 
-    tank->data.pose.x += dt * linearVelocity * cos(tank->data.pose.angle);
-    tank->data.pose.y += dt * linearVelocity * sin(tank->data.pose.angle);
-    tank->data.pose.angle += dt * angularVelocity;
-    while(tank->data.pose.angle<0) tank->data.pose.angle += 2*PI;
-    while(tank->data.pose.angle>2*PI) tank->data.pose.angle -= 2*PI;
+    tank->data.pose.x += dt * vx;
+    tank->data.pose.y += dt * vy;
+    if(vx!=0 || vy!=0)
+        tank->data.pose.angle = atan2(vy, vx);
+    tank->children->data.pose.x = tank->data.pose.x;
+    tank->children->data.pose.y = tank->data.pose.y;
 }
 
-void updateTurret(
+void pointTurret(
     Entity* tank,
     double targetX, double targetY,
     double dt)
 {
-    // Update turret angle
-
     Entity* turret = tank->children;
+    double dx = targetX - turret->data.pose.x;
+    double dy = targetY - turret->data.pose.y;
+    double angle = atan2(dy, dx);
+    int index = (int)floor((angle+PI/8)/(PI/4));
+    turret->data.pose.angle = index*PI/4;
+}
 
-    Pose absolute = addPose(tank->data.pose, turret->data.pose);
-    double dx = targetX - absolute.x;
-    double dy = targetY - absolute.y;
-    double targetAngle = atan2(dy, dx);
-
-    // Make angleDif go from -PI to PI
-    double difAngle = targetAngle - absolute.angle;
-    while(difAngle<-PI) difAngle += 2*PI;
-    while(difAngle>PI) difAngle -= 2*PI;
-
-    double changeAngle = dt * turret->data.turret.rotateSpeed;
-    if(difAngle < 0) changeAngle = -changeAngle;
-
-    if(fabs(difAngle) < fabs(changeAngle)){
-        turret->data.pose.angle = targetAngle - tank->data.pose.angle;
-        if(turret->data.pose.angle < 0)
-            turret->data.pose.angle += 2*PI;
-    }else{
-        turret->data.pose.angle += changeAngle;
-    }
+void alignTurret(Entity* tank){
+    // Sets the turret angle to the tank angle
+    tank->children->data.pose.angle = tank->data.pose.angle;
 }
 
 int entityUpdatePlayer(Entity* player, Input* input, double dt)
 {
-    double linearVelocity = 0;
-    double angularVelocity = 0;
+    double vx = 0;
+    double vy = 0;
 
     if(input->w && !input->s){
-        linearVelocity = player->data.tank.forwardSpeed;
+        vy = -player->data.tank.speed;
     }else if(input->s && !input->w){
-        linearVelocity = - player->data.tank.backwardSpeed;
+        vy = player->data.tank.speed;
     }
-    if(linearVelocity != 0){
-        if(input->a && !input->d){
-            angularVelocity = -player->data.tank.rotateSpeed;
-        }else if(input->d && !input->a){
-            angularVelocity = player->data.tank.rotateSpeed;
-        }
-        if(linearVelocity<0) angularVelocity = -angularVelocity;
+    if(input->a && !input->d){
+        vx = -player->data.tank.speed;
+    }else if(input->d && !input->a){
+        vx = player->data.tank.speed;
+    }
+
+    if(vx!=0 && vy!=0){
+        vx/=sqrt(2);
+        vy/=sqrt(2);
     }
 
     int mx, my;
     SDL_GetMouseState(&mx, &my);
-    updateTank(player, linearVelocity, angularVelocity, dt);
-    updateTurret(player, (double)mx, (double)my, dt);
+    updateTank(player, vx, vy, dt);
+    pointTurret(player, (double)mx, (double)my, dt);
     return 0;
 }
 
 int entityUpdateDummy(Entity* entity, Input* input, double dt)
 {
+    static double dummyParam = 0;
+    dummyParam += dt*0.2;
+    if(dummyParam>=1) dummyParam=0;
     updateTank(
         entity,
-        entity->data.tank.forwardSpeed,
-        entity->data.tank.rotateSpeed,
+        200*cos(dummyParam*2*PI),
+        200*sin(dummyParam*2*PI),
         dt
     );
+    alignTurret(entity);
     return 0;
 }
 
