@@ -18,7 +18,8 @@ World* initWorld(void)
     player.pose.y = 300;
     player.sprite = SPRITE_PLAYER_BASE;
     player.update = entityUpdatePlayer;
-    player.tank.speed = 400;
+    player.tank.linearSpeed = 400;
+    player.tank.rotateSpeed = 3;
 
     Entity* entity = insertEntity(&(world->entities), player);
 

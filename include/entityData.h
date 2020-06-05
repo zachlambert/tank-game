@@ -6,7 +6,8 @@
 #include "input.h"
 
 struct EntityDataTank {
-    double speed;
+    double linearSpeed;
+    double rotateSpeed;
 };
 
 struct EntityDataTurret {

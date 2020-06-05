@@ -5,16 +5,18 @@
 
 void updateTank(
     Entity* tank,
-    double vx,
-    double vy,
+    double linearVelocity,
+    double angularVelocity,
     double dt)
 {
     // Update tank pose
 
-    tank->data.pose.x += dt * vx;
-    tank->data.pose.y += dt * vy;
-    if(vx!=0 || vy!=0)
-        tank->data.pose.angle = atan2(vy, vx);
+    tank->data.pose.x += dt * linearVelocity * cos(tank->data.pose.angle);
+    tank->data.pose.y += dt * linearVelocity * sin(tank->data.pose.angle);
+    tank->data.pose.angle += dt * angularVelocity;
+    if(tank->data.pose.angle<-PI) tank->data.pose.angle+=2*PI;
+    if(tank->data.pose.angle>PI) tank->data.pose.angle-=2*PI;
+
     tank->children->data.pose.x = tank->data.pose.x;
     tank->children->data.pose.y = tank->data.pose.y;
 }
@@ -27,9 +29,7 @@ void pointTurret(
     Entity* turret = tank->children;
     double dx = targetX - turret->data.pose.x;
     double dy = targetY - turret->data.pose.y;
-    double angle = atan2(dy, dx);
-    int index = (int)floor((angle+PI/8)/(PI/4));
-    turret->data.pose.angle = index*PI/4;
+    turret->data.pose.angle = atan2(dy, dx);
 }
 
 void alignTurret(Entity* tank){
@@ -39,43 +39,30 @@ void alignTurret(Entity* tank){
 
 int entityUpdatePlayer(Entity* player, Input* input, double dt)
 {
-    double vx = 0;
-    double vy = 0;
+    double linearVelocity = 0;
+    double angularVelocity = 0;
 
     if(input->w && !input->s){
-        vy = -player->data.tank.speed;
+        linearVelocity = player->data.tank.linearSpeed;
     }else if(input->s && !input->w){
-        vy = player->data.tank.speed;
+        linearVelocity = -player->data.tank.linearSpeed;
     }
     if(input->a && !input->d){
-        vx = -player->data.tank.speed;
+        angularVelocity = -player->data.tank.rotateSpeed;
     }else if(input->d && !input->a){
-        vx = player->data.tank.speed;
-    }
-
-    if(vx!=0 && vy!=0){
-        vx/=sqrt(2);
-        vy/=sqrt(2);
+        angularVelocity = player->data.tank.rotateSpeed;
     }
 
     int mx, my;
     SDL_GetMouseState(&mx, &my);
-    updateTank(player, vx, vy, dt);
+    updateTank(player, linearVelocity, angularVelocity, dt);
     pointTurret(player, (double)mx, (double)my, dt);
     return 0;
 }
 
 int entityUpdateDummy(Entity* entity, Input* input, double dt)
 {
-    static double dummyParam = 0;
-    dummyParam += dt*0.2;
-    if(dummyParam>=1) dummyParam=0;
-    updateTank(
-        entity,
-        200*cos(dummyParam*2*PI),
-        200*sin(dummyParam*2*PI),
-        dt
-    );
+    updateTank(entity, 200, 2, dt);
     alignTurret(entity);
     return 0;
 }
