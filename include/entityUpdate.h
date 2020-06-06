@@ -4,7 +4,9 @@
 #include "entity.h"
 #include "input.h"
 
-int entityUpdatePlayer(Entity*, Input*, double);
-int entityUpdateDummy(Entity*, Input*, double);
+struct World;
+int entityUpdatePlayer(Entity*, struct World*, Input*, double);
+int entityUpdateDummy(Entity*, struct World*, Input*, double);
+int entityUpdateBullet(Entity*, struct World*, Input*, double);
 
 #endif

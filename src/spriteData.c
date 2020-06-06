@@ -154,6 +154,13 @@ SpriteData* initSpriteData(SDL_Renderer* renderer, Level* levels)
         renderer, "graphics/tankRedTurret.png", NUM_ROTATIONS);
     textures[SPRITE_TANK_RED_TURRET] = tankRedTurretTexture;
 
+    SDL_Texture* bulletBlueTexture = loadRotatingTexture(
+        renderer, "graphics/bulletBlue.png", NUM_ROTATIONS);
+    textures[SPRITE_BULLET_BLUE] = bulletBlueTexture;
+
+    SDL_Texture* bulletRedTexture = loadRotatingTexture(
+        renderer, "graphics/bulletRed.png", NUM_ROTATIONS);
+    textures[SPRITE_BULLET_RED] = bulletRedTexture;
 
 
     // In order to assign memory to a struct with const elements,

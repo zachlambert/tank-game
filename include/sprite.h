@@ -10,6 +10,8 @@ typedef enum {
     SPRITE_TANK_BLUE_TURRET,
     SPRITE_TANK_RED_BASE,
     SPRITE_TANK_RED_TURRET,
+    SPRITE_BULLET_BLUE,
+    SPRITE_BULLET_RED,
     SPRITE_COUNT // Use this to get the number of sprites
 } Sprite;
 

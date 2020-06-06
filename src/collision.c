@@ -28,9 +28,9 @@ void findLevelCollisions(
     // Tiles covered by the bounding box
     int bx1, by1, bx2, by2;
     bx1 = floor((entity->data.pose.x - entity->data.radius) / level->tileWidth);
-    by1 = floor((entity->data.pose.y - entity->data.radius) / level->tileWidth);
+    by1 = floor((entity->data.pose.y - entity->data.radius) / level->tileHeight);
     bx2 = floor((entity->data.pose.x + entity->data.radius) / level->tileWidth);
-    by2 = floor((entity->data.pose.y + entity->data.radius) / level->tileWidth);
+    by2 = floor((entity->data.pose.y + entity->data.radius) / level->tileHeight);
 
     // Tile covered by entity centre
     int centreX, centreY;
@@ -116,6 +116,7 @@ void findLevelCollisions(
 }
 
 bool checkEntityCollision(Entity* first, Entity* second, CollisionData* data){
+    if(first->data.radius==0 || second->data.radius==0) return false;
     double deltaX = second->data.pose.x - first->data.pose.x;
     double deltaY = second->data.pose.y - first->data.pose.y;
     double dist = hypot(deltaX, deltaY);
@@ -148,6 +149,7 @@ void findCollisions(World* world)
     // Find entity-level collisions
     Entity* entity = world->entities;
     Collision* collision = NULL;
+    int i=0;
     while(entity != NULL){
         findLevelCollisions(entity, world->level, &collision);
         entity = entity->next;
@@ -158,13 +160,15 @@ void findCollisions(World* world)
     CollisionData data;
     while(first != NULL){
         data.first = first;
-        second = first->next;
-        while(second != NULL){
-            data.second = second;
-            if(checkEntityCollision(first, second, &data)){
-                addCollision(&collision, &data);
+        if(first->data.radius!=0){
+            second = first->next;
+            while(second != NULL){
+                data.second = second;
+                if(checkEntityCollision(first, second, &data)){
+                    addCollision(&collision, &data);
+                }
+                second = second->next;
             }
-            second = second->next;
         }
         first = first->next;
     }

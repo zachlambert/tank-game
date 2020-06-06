@@ -94,38 +94,6 @@ void drawSprite(
     }
 }
 
-void drawCollisionInformation(SDL_Renderer* renderer, Entity* entity){
-    // Draw collision points
-    Collision* collision = entity->data.collision;
-    while(collision){
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(
-            renderer,
-            entity->data.pose.x, entity->data.pose.y,
-            collision->data.x, collision->data.y);
-        SDL_SetRenderDrawColor(renderer, 0, 255, 255, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(
-            renderer,
-            entity->data.pose.x, entity->data.pose.y,
-            entity->data.pose.x + collision->data.normalX*entity->data.radius,
-            entity->data.pose.y + collision->data.normalY*entity->data.radius);
-        collision = collision->next;
-    }
-    // Draw a rough circle
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-    double angle = 0;
-    double deltaAngle = PI/8;
-    while(angle<2*PI){
-        SDL_RenderDrawLine(
-            renderer,
-            entity->data.pose.x + entity->data.radius*cos(angle),
-            entity->data.pose.y + entity->data.radius*sin(angle),
-            entity->data.pose.x + entity->data.radius*cos(angle+deltaAngle),
-            entity->data.pose.y + entity->data.radius*sin(angle+deltaAngle));
-        angle+=deltaAngle;
-    }
-}
-
 void drawEntities(
     SDL_Renderer* renderer,
     Entity* entity,
@@ -139,8 +107,6 @@ void drawEntities(
             // Won't be many layers, recursion probably fine.
             // Can change later if necessary
         }
-        drawCollisionInformation(renderer, entity);
-        // Next
         entity = entity->next;
     }
 }
@@ -151,7 +117,7 @@ void drawScene(
     SpriteData* spriteData)
 {
     // RGBA
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(renderer, 220, 220, 220, 255);
 	SDL_RenderClear(renderer);
 
     static Pose levelPose = {0, 0, 0};

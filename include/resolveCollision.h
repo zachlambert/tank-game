@@ -3,7 +3,7 @@
 
 #include "entity.h"
 
-int moveOutOfCollision(Entity* entity);
-int tankMoveOutOfCollision(Entity* entity);
+int resolveCollisionTank(Entity* entity);
+int resolveCollisionBullet(Entity* entity);
 
 #endif
