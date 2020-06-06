@@ -6,7 +6,8 @@
 
 #include "world.h"
 #include "input.h"
-#include "sprite.h"
+#include "spriteData.h"
+#include "level.h"
 
 typedef struct {
     const int SCREEN_WIDTH;
@@ -16,6 +17,8 @@ typedef struct {
     World* world;
     Input* input;
     SpriteData* spriteData;
+    Level* levels;
+    size_t numLevels;
 } App;
 
 int initApp(App* app);

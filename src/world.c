@@ -7,16 +7,19 @@
 
 #define PI 3.14159
 
-World* initWorld(void)
+World* initWorld(Level* level)
 {
     // Create world
     World* world = calloc(1, sizeof(World));
+
+    // Set the level
+    world->level = level;
 
     // The player will be the first entity
     EntityData player;
     player.pose.x = 500;
     player.pose.y = 300;
-    player.sprite = SPRITE_PLAYER_BASE;
+    player.sprite = SPRITE_TANK_BLUE_BASE;
     player.update = entityUpdatePlayer;
     player.tank.linearSpeed = 400;
     player.tank.rotateSpeed = 3;
@@ -25,7 +28,7 @@ World* initWorld(void)
 
     EntityData turret;
     turret.pose.x = 0;
-    turret.sprite = SPRITE_PLAYER_TURRET;
+    turret.sprite = SPRITE_TANK_BLUE_TURRET;
     turret.turret.rotateSpeed = 8;
 
     insertChild(entity, turret);
@@ -33,7 +36,9 @@ World* initWorld(void)
     // Create a dummy tank, re-use data
     player.pose.x = 300;
     player.update = entityUpdateDummy;
+    player.sprite = SPRITE_TANK_RED_BASE;
     entity = insertEntity(&world->entities, player);
+    turret.sprite = SPRITE_TANK_RED_TURRET;
     insertChild(entity, turret);
 
     return world;

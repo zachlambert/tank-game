@@ -1,5 +1,5 @@
 
-#include "sprite.h"
+#include "spriteData.h"
 #include <SDL_image.h>
 
 #define PI 3.14159
@@ -20,17 +20,53 @@ SDL_Texture* loadTexture(SDL_Renderer* renderer, char* filename)
     return texture;
 }
 
+SDL_Texture* loadLevelTexture(SDL_Renderer* renderer, char* filename, Level* level)
+{
+    SDL_Rect src;
+    Uint32 format;
+    SDL_Texture* tile = loadTexture(renderer, filename);
+    if(!tile)
+        return 0;
+
+    SDL_QueryTexture(tile, &format, NULL, &src.w, &src.h);
+
+    // Create texture for entire level
+    SDL_Texture* levelTexture = SDL_CreateTexture(
+        renderer, format, SDL_TEXTUREACCESS_TARGET,
+        level->width*src.w, level->height*src.h);
+
+    SDL_SetRenderTarget(renderer, levelTexture);
+    SDL_SetTextureBlendMode(levelTexture, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_RenderClear(renderer);
+
+    size_t index;
+    for(size_t j=0; j<level->height; j++){
+        for(size_t i=0; i<level->width; i++){
+            index = j*level->width + i; 
+            SDL_Rect dest = {src.w*i, src.h*j, src.w, src.h};
+            if(level->data[index]){
+                SDL_RenderCopy(renderer, tile, NULL, &dest);
+            }
+        }
+    }
+    SDL_DestroyTexture(tile);
+    SDL_SetRenderTarget(renderer, NULL);
+    return levelTexture;
+}
+
 SDL_Texture* loadRotatingTexture(
     SDL_Renderer* renderer, char* filename, const int NUM_ROTATIONS)
 {
     // Load the original texture
-    SDL_Rect src;
+    SDL_Rect src = {0, 0, 0, 0};
     Uint32 format;
+    int access;
     SDL_Texture* original = loadTexture(renderer, filename);
     if(original == 0)
         return 0;
     // Get the size with SDL_QueryTexture
-    SDL_QueryTexture(original, &format, NULL, &src.w, &src.h);
+    SDL_QueryTexture(original, &format, &access, &src.w, &src.h);
 
     // Find the bounding square size
     int size = src.w>src.h ? src.w : src.h;
@@ -51,12 +87,11 @@ SDL_Texture* loadRotatingTexture(
     // texture
 	SDL_RenderClear(renderer);
     // Copy the original image onto the render target (square)
-    SDL_RenderCopy(renderer, original, &src, &dest);
+    SDL_RenderCopy(renderer, original, NULL, &dest);
 
     SDL_Texture* new_texture = SDL_CreateTexture(
         renderer, format, SDL_TEXTUREACCESS_TARGET,
         size*NUM_ROTATIONS, size);
-
     // Do the same steps as before to clear this texture and
     // set it up for writing to
     SDL_SetRenderTarget(renderer, new_texture);
@@ -83,32 +118,39 @@ SDL_Texture* loadRotatingTexture(
     return new_texture; //new_texture;
 }
 
-SpriteData* initSpriteData(SDL_Renderer* renderer)
+SpriteData* initSpriteData(SDL_Renderer* renderer, Level* levels)
 {
     int count = SPRITE_COUNT;
     SDL_Texture** textures = calloc(count, sizeof(SDL_Texture*));
 
-    // Create a texture for each sprite, otherwise it can just be left
-    // as a null pointer as a placeholder
-    // Don't need to initialise in the order they appear in the enum
-    // but it is useful and makes sure FIRST_ROTATION is correct.
+    // Non-rotated sprites
 
-    // Non-rotated sprites - Used as is
+    SDL_Texture* levelTexture = loadLevelTexture(
+        renderer, "graphics/level_tile.png", levels);
+    textures[SPRITE_LEVEL] = levelTexture;
 
-    // Rotated-sprites - All sprites in this section pre-render
-    // sprites for each rotation, and when drawing, index by
-    // the quantised rotation.
+    // Rotated-sprites
 
     const int NUM_ROTATIONS = 64;
-    const int FIRST_ROTATION = SPRITE_PLAYER_BASE;
+    const int FIRST_ROTATION = SPRITE_TANK_BLUE_BASE;
 
-    SDL_Texture* player_base_texture = loadRotatingTexture(
-        renderer, "graphics/player_base.png", NUM_ROTATIONS);
-    textures[SPRITE_PLAYER_BASE] = player_base_texture;
+    SDL_Texture* tankBlueBaseTexture = loadRotatingTexture(
+        renderer, "graphics/tankBlueBase.png", NUM_ROTATIONS);
+    textures[SPRITE_TANK_BLUE_BASE] = tankBlueBaseTexture;
 
-    SDL_Texture* player_turret_texture = loadRotatingTexture(
-        renderer, "graphics/player_turret.png", NUM_ROTATIONS);
-    textures[SPRITE_PLAYER_TURRET] = player_turret_texture;
+    SDL_Texture* tankBlueTurretTexture = loadRotatingTexture(
+        renderer, "graphics/tankBlueTurret.png", NUM_ROTATIONS);
+    textures[SPRITE_TANK_BLUE_TURRET] = tankBlueTurretTexture;
+    
+    SDL_Texture* tankRedBaseTexture = loadRotatingTexture(
+        renderer, "graphics/tankRedBase.png", NUM_ROTATIONS);
+    textures[SPRITE_TANK_RED_BASE] = tankRedBaseTexture;
+
+    SDL_Texture* tankRedTurretTexture = loadRotatingTexture(
+        renderer, "graphics/tankRedTurret.png", NUM_ROTATIONS);
+    textures[SPRITE_TANK_RED_TURRET] = tankRedTurretTexture;
+
+
 
     // In order to assign memory to a struct with const elements,
     // you need to initialise the object with an initialiser list.

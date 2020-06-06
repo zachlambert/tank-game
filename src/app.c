@@ -6,6 +6,7 @@
 #include "sprite.h"
 #include "world.h"
 #include "draw.h"
+#include "level.h"
 
 int initApp(App* app)
 {
@@ -48,16 +49,19 @@ int initApp(App* app)
     // Initialise images
     IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
 
-    // Load textures, get sprite data
+    // Initialise levels
+    app->levels = initLevels();
 
-    app->spriteData = initSpriteData(app->renderer);
+    // Load textures, get sprite data
+    app->spriteData = initSpriteData(app->renderer, app->levels);
     if (!app->spriteData)
     {
         printf("Failed to load sprites.\n");
         return 1;
     }
 
-    app->world = initWorld();
+    // Load the world, with one of the levels
+    app->world = initWorld(app->levels);
     if(!app->world)
         return 1;
 
@@ -65,9 +69,6 @@ int initApp(App* app)
 }
 
 void runApp(App* app){
-	if(initApp(app))
-        return;
-
     Input* input = calloc(1, sizeof(Input));
     app->input = input;
 

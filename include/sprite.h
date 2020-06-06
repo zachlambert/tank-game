@@ -5,17 +5,12 @@
 
 typedef enum {
     SPRITE_NONE, // Can leave Sprite=0 to indicate no sprite
-    SPRITE_PLAYER_BASE,
-    SPRITE_PLAYER_TURRET,
+    SPRITE_LEVEL,
+    SPRITE_TANK_BLUE_BASE,
+    SPRITE_TANK_BLUE_TURRET,
+    SPRITE_TANK_RED_BASE,
+    SPRITE_TANK_RED_TURRET,
     SPRITE_COUNT // Use this to get the number of sprites
 } Sprite;
-
-typedef struct {
-    const int FIRST_ROTATION; // Index of first sprite to be rotated
-    const int NUM_ROTATIONS; // Number of rotations to pre-render
-    SDL_Texture** textures; // Array of (pointers to) textures
-} SpriteData;
-
-SpriteData* initSpriteData(SDL_Renderer* renderer);
 
 #endif
