@@ -24,7 +24,7 @@ World* initWorld(Level* level)
     player.update = entityUpdatePlayer;
     player.tank.linearSpeed = 400;
     player.tank.rotateSpeed = 3;
-    player.radius = 64;
+    player.radius = 32;
 
     Entity* entity = insertEntity(&(world->entities), player);
 
@@ -35,12 +35,12 @@ World* initWorld(Level* level)
     insertChild(entity, turret);
 
     // Create a dummy tank, re-use data
-    // player.pose.x = 300;
-    // player.update = entityUpdateDummy;
-    // player.sprite = SPRITE_TANK_RED_BASE;
-    // entity = insertEntity(&world->entities, player);
-    // turret.sprite = SPRITE_TANK_RED_TURRET;
-    // insertChild(entity, turret);
+    player.pose.x = 300;
+    player.update = entityUpdateDummy;
+    player.sprite = SPRITE_TANK_RED_BASE;
+    entity = insertEntity(&world->entities, player);
+    turret.sprite = SPRITE_TANK_RED_TURRET;
+    insertChild(entity, turret);
 
     return world;
 }

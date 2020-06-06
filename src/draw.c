@@ -97,15 +97,22 @@ void drawSprite(
 void drawCollisionInformation(SDL_Renderer* renderer, Entity* entity){
     // Draw collision points
     Collision* collision = entity->data.collision;
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
     while(collision){
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderDrawLine(
             renderer,
             entity->data.pose.x, entity->data.pose.y,
             collision->data.x, collision->data.y);
+        SDL_SetRenderDrawColor(renderer, 0, 255, 255, SDL_ALPHA_OPAQUE);
+        SDL_RenderDrawLine(
+            renderer,
+            entity->data.pose.x, entity->data.pose.y,
+            entity->data.pose.x + collision->data.normalX*entity->data.radius,
+            entity->data.pose.y + collision->data.normalY*entity->data.radius);
         collision = collision->next;
     }
     // Draw a rough circle
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
     double angle = 0;
     double deltaAngle = PI/8;
     while(angle<2*PI){

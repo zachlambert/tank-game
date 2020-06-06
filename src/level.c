@@ -43,6 +43,10 @@ Level* initLevels(void){
     return levels;
 }
 
-char getLevelTile(Level* level, size_t x, size_t y){
-    return level->data[level->width*y + x];
+char getLevelTile(Level* level, int x, int y){
+    if(x>=0 && x<level->width && y>=0 && y<level->height){
+        return level->data[level->width*y + x];
+    }else{
+        return '0';
+    }
 }

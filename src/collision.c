@@ -44,7 +44,6 @@ void findLevelCollisions(
 
     //First, check the tiles aligned to the centre
     // Horizontal
-    printf("%c\n", getLevelTile(level, bx1, centreY));
     if(getLevelTile(level, bx1, centreY) != '0'){
         data.x = (bx1+1)*level->tileWidth;
         data.y = entity->data.pose.y;
@@ -72,8 +71,6 @@ void findLevelCollisions(
         data.normalY = 1;
         addCollision(collision, &data);
     }
-
-    // Check corners
 
     // Iterative over tiles
     double dist, dx, dy;
@@ -107,7 +104,7 @@ void findLevelCollisions(
             if(getLevelTile(level, x+offsetX, y)!='0' ||
                getLevelTile(level, x, y+offsetY)!='0') continue;
             dx = data.x - entity->data.pose.x;
-            dx = data.y - entity->data.pose.y;
+            dy = data.y - entity->data.pose.y;
             dist = hypot(dx, dy);
             if(dist < entity->data.radius){
                 data.normalX = dx/dist;
@@ -184,6 +181,8 @@ void findCollisions(World* world)
             Entity* temp = collision->data.first;
             collision->data.first = collision->data.second;
             collision->data.second = temp;
+            collision->data.normalX*=-1;
+            collision->data.normalY*=-1;
             addCollision(
                 &collision->data.first->data.collision,
                 &collision->data);

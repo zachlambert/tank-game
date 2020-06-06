@@ -14,6 +14,6 @@ typedef struct{
 
 Level getLevel(char* filename);
 Level* initLevels(void);
-char getLevelTile(Level* level, size_t x, size_t y);
+char getLevelTile(Level* level, int x, int y);
 
 #endif
