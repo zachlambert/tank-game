@@ -114,7 +114,6 @@ void findCollisionEntityLevel(
     // Iterative over tiles
     for(int y = by1; y<=by2; y++){
         for(int x = bx1; x<=bx2; x++){
-            printf("Checking (%i, %i)\n", x, y);
             // Make sure the tile is in range
             if(x<0 || y<0 || x>=level->width || y>=level->height) continue;
             // Skip if the tile is empty
@@ -127,6 +126,21 @@ void findCollisionEntityLevel(
     }
 }
 
+bool checkEntityCollision(Entity* first, Entity* second, CollisionData* data){
+    double deltaX = second->data.pose.x - first->data.pose.x;
+    double deltaY = second->data.pose.y - first->data.pose.y;
+    double dist = hypot(deltaX, deltaY);
+    if(dist > first->data.radius + second->data.radius){
+        return false;
+    }else{
+        data->x = first->data.pose.x + deltaX*(first->data.radius/dist);
+        data->y = first->data.pose.y + deltaY*(first->data.radius/dist);
+        data->normalX = deltaX/dist;
+        data->normalY = deltaY/dist;
+        return true;
+    }
+}
+
 void resolveCollisions(World* world)
 {
     // Only looks at first-level entities for collision, other entities
@@ -135,19 +149,38 @@ void resolveCollisions(World* world)
     // Find entity-level collisions
     Entity* entity = world->entities;
     Collision* collision = NULL;
-    CollisionData data;
     while(entity != NULL){
         findCollisionEntityLevel(entity, world->level, &collision);
         entity = entity->next;
     }
     // Find entity-entity collisions
-    // Todo
+    Entity *first, *second;
+    first = world->entities;
+    CollisionData data;
+    while(first != NULL){
+        data.first = first;
+        second = first->next;
+        while(second != NULL){
+            data.second = second;
+            if(checkEntityCollision(first, second, &data)){
+                addCollision(&collision, &data);
+            }
+            second = second->next;
+        }
+        first = first->next;
+    }
+
 
     // Resolve the collisions
     Collision* prev;
     if(collision != NULL){
         // Process the collision: todo
-        printf("Collision\n");
+        printf(
+            "ENTITY-%s (%f, %f) norm (%f, %f)\n",
+            (collision->data.second?"ENTITY":"TILE"),
+            collision->data.x, collision->data.y,
+            collision->data.normalX, collision->data.normalY
+        );
         prev = collision;
         collision = collision->next;
         free(prev);

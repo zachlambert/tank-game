@@ -35,12 +35,12 @@ World* initWorld(Level* level)
     insertChild(entity, turret);
 
     // Create a dummy tank, re-use data
-    // player.pose.x = 300;
-    // player.update = entityUpdateDummy;
-    // player.sprite = SPRITE_TANK_RED_BASE;
-    // entity = insertEntity(&world->entities, player);
-    // turret.sprite = SPRITE_TANK_RED_TURRET;
-    // insertChild(entity, turret);
+    player.pose.x = 300;
+    player.update = entityUpdateDummy;
+    player.sprite = SPRITE_TANK_RED_BASE;
+    entity = insertEntity(&world->entities, player);
+    turret.sprite = SPRITE_TANK_RED_TURRET;
+    insertChild(entity, turret);
 
     return world;
 }
