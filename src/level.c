@@ -14,13 +14,26 @@ Level getLevel(char* filename){
     }
     char buf[255];
     fscanf(fp, "%s", buf);
-    printf("%li\n", strlen(buf));
-    level.width = 4;
-    level.height = 3;
-    int levelData[12] = {1,1,1,1,1,0,0,1,1,1,1,1};
+    size_t i = 0;
+    size_t scanReturn = 0;
+    while(scanReturn != EOF){
+        scanReturn = fscanf(fp, "%s", buf);
+        i++;
+    }
+    level.width = strlen(buf);
+    level.height = i;
     level.data = malloc(level.width*level.height*sizeof(int)); 
-    memcpy(level.data, levelData, level.width*level.height*sizeof(int));
+    i = 0;
+    fclose(fp);
+    fp = fopen(filename, "r");
+    scanReturn = 0;
+    while(scanReturn !=EOF){
+        scanReturn = fscanf(fp, "%s", buf);
+        memcpy(level.data + i*level.width, buf, level.width);
+        i++;
+    }
     level.sprite = SPRITE_LEVEL;
+    fclose(fp);
     return level;
 }
 

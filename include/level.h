@@ -4,9 +4,9 @@
 #include "sprite.h"
 
 typedef struct{
-    int width;
-    int height;
-    int* data;
+    size_t width;
+    size_t height;
+    char* data;
     Sprite sprite;
 }Level;
 

@@ -45,7 +45,8 @@ SDL_Texture* loadLevelTexture(SDL_Renderer* renderer, char* filename, Level* lev
         for(size_t i=0; i<level->width; i++){
             index = j*level->width + i; 
             SDL_Rect dest = {src.w*i, src.h*j, src.w, src.h};
-            if(level->data[index]){
+            printf("%c\n", level->data[index]);
+            if(level->data[index]!='0'){
                 SDL_RenderCopy(renderer, tile, NULL, &dest);
             }
         }
@@ -126,7 +127,7 @@ SpriteData* initSpriteData(SDL_Renderer* renderer, Level* levels)
     // Non-rotated sprites
 
     SDL_Texture* levelTexture = loadLevelTexture(
-        renderer, "graphics/level_tile.png", levels);
+        renderer, "graphics/levelTile.png", levels);
     textures[SPRITE_LEVEL] = levelTexture;
 
     // Rotated-sprites
