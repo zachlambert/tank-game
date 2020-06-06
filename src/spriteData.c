@@ -30,6 +30,10 @@ SDL_Texture* loadLevelTexture(SDL_Renderer* renderer, char* filename, Level* lev
 
     SDL_QueryTexture(tile, &format, NULL, &src.w, &src.h);
 
+    // Set the level tile size
+    level->tileWidth = src.w;
+    level->tileHeight = src.h;
+
     // Create texture for entire level
     SDL_Texture* levelTexture = SDL_CreateTexture(
         renderer, format, SDL_TEXTUREACCESS_TARGET,
@@ -45,7 +49,6 @@ SDL_Texture* loadLevelTexture(SDL_Renderer* renderer, char* filename, Level* lev
         for(size_t i=0; i<level->width; i++){
             index = j*level->width + i; 
             SDL_Rect dest = {src.w*i, src.h*j, src.w, src.h};
-            printf("%c\n", level->data[index]);
             if(level->data[index]!='0'){
                 SDL_RenderCopy(renderer, tile, NULL, &dest);
             }

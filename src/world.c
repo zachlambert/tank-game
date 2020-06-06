@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include "entity.h"
 #include "entityUpdate.h"
+#include "collision.h"
 
 #define PI 3.14159
 
@@ -23,23 +24,23 @@ World* initWorld(Level* level)
     player.update = entityUpdatePlayer;
     player.tank.linearSpeed = 400;
     player.tank.rotateSpeed = 3;
+    player.radius = 32;
 
     Entity* entity = insertEntity(&(world->entities), player);
 
     EntityData turret;
-    turret.pose.x = 0;
     turret.sprite = SPRITE_TANK_BLUE_TURRET;
     turret.turret.rotateSpeed = 8;
 
     insertChild(entity, turret);
 
     // Create a dummy tank, re-use data
-    player.pose.x = 300;
-    player.update = entityUpdateDummy;
-    player.sprite = SPRITE_TANK_RED_BASE;
-    entity = insertEntity(&world->entities, player);
-    turret.sprite = SPRITE_TANK_RED_TURRET;
-    insertChild(entity, turret);
+    // player.pose.x = 300;
+    // player.update = entityUpdateDummy;
+    // player.sprite = SPRITE_TANK_RED_BASE;
+    // entity = insertEntity(&world->entities, player);
+    // turret.sprite = SPRITE_TANK_RED_TURRET;
+    // insertChild(entity, turret);
 
     return world;
 }
@@ -51,7 +52,9 @@ void updateWorld(World* world, Input* input, double dt)
         if(entity->data.update){
             // Don't check for children
             // Children are updated by the specific update function
+            entity->data.prevPose = entity->data.pose;
             entity->data.update(entity, input, dt);
+            resolveCollisions(world);
         }
         entity = entity->next;
     }

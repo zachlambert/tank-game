@@ -6,7 +6,7 @@
 #include "input.h"
 #include "level.h"
 
-typedef struct {
+typedef struct World{
     Entity* entities;
     Entity* player; // Specific entity corresponding to player
     Level* level;

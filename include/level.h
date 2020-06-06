@@ -8,6 +8,8 @@ typedef struct{
     size_t height;
     char* data;
     Sprite sprite;
+    size_t tileWidth;
+    size_t tileHeight;
 }Level;
 
 Level getLevel(char* filename);

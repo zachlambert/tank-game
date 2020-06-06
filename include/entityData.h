@@ -19,7 +19,9 @@ typedef int (*EntityUpdate)(struct Entity*, Input*, double);
 
 typedef struct {
     Pose pose;
+    Pose prevPose;
     Sprite sprite;
+    unsigned int radius;
     EntityUpdate update;
     union { // Unnamed union
         struct EntityDataTank tank;
