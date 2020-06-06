@@ -3,6 +3,7 @@
 
 #include "entity.h"
 
-void moveOutOfCollision(Entity* entity);
+int moveOutOfCollision(Entity* entity);
+int tankMoveOutOfCollision(Entity* entity);
 
 #endif

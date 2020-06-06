@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "entityUpdate.h"
 #include "collision.h"
+#include "collisionResolve.h"
 
 #define PI 3.14159
 
@@ -22,6 +23,7 @@ World* initWorld(Level* level)
     player.pose.y = 300;
     player.sprite = SPRITE_TANK_BLUE_BASE;
     player.update = entityUpdatePlayer;
+    player.resolveCollision = tankMoveOutOfCollision;
     player.tank.linearSpeed = 400;
     player.tank.rotateSpeed = 3;
     player.radius = 32;
@@ -54,9 +56,16 @@ void updateWorld(World* world, Input* input, double dt)
             // Children are updated by the specific update function
             entity->data.prevPose = entity->data.pose;
             entity->data.update(entity, input, dt);
-            clearEntityCollisions(entity); // Clear any previous collisions
-            findCollisions(world);
         }
+        entity = entity->next;
+    }
+    findCollisions(world);
+    entity = world->entities;
+    while(entity){
+        if(entity->data.resolveCollision){
+            entity->data.resolveCollision(entity);
+        }
+        clearEntityCollisions(entity); // Clear any previous collisions
         entity = entity->next;
     }
 }

@@ -1,7 +1,7 @@
 
 #include "collisionResolve.h"
 
-void moveOutOfCollision(Entity* entity){
+int moveOutOfCollision(Entity* entity){
     Collision* collision = entity->data.collision;
     while(collision){
         double dx, dy, dist;
@@ -14,4 +14,12 @@ void moveOutOfCollision(Entity* entity){
         }
         collision = collision->next;
     }
+    return 0;
+}
+
+int tankMoveOutOfCollision(Entity* entity){
+    int result = moveOutOfCollision(entity);
+    entity->children->data.pose.x = entity->data.pose.x;
+    entity->children->data.pose.y = entity->data.pose.y;
+    return result;
 }

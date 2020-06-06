@@ -17,6 +17,7 @@ struct EntityDataTurret {
 
 struct Entity; // Forward declare only need the pointer
 typedef int (*EntityUpdate)(struct Entity*, Input*, double);
+typedef int (*EntityResolveCollision)(struct Entity*);
 
 typedef struct {
     Pose pose;
@@ -29,7 +30,7 @@ typedef struct {
         struct EntityDataTurret turret;
     };
     Collision* collision;
-
+    EntityResolveCollision resolveCollision;
 } EntityData;
 
 #endif
