@@ -12,20 +12,27 @@ void moveOutOfCollisionSingle(Entity* entity, Collision* collision){
     }
 }
 
-int moveOutOfCollision(Entity* entity){
+void moveOutOfCollision(Entity* entity){
     Collision* collision = entity->data.collision;
     while(collision){
         moveOutOfCollisionSingle(entity, collision);
         collision = collision->next;
     }
-    return 0;
 }
 
 int resolveCollisionTank(Entity* entity){
-    int result = moveOutOfCollision(entity);
+    moveOutOfCollision(entity);
     entity->children->data.pose.x = entity->data.pose.x;
     entity->children->data.pose.y = entity->data.pose.y;
-    return result;
+    Collision* collision = entity->data.collision;
+    while(collision){
+        if(collision->data.second && collision->data.second->data.type==BULLET
+            && collision->data.second->data.bullet.team != entity->data.tank.team){
+            return 1;
+        }
+        collision = collision->next;
+    }
+    return 0;
 }
 
 int resolveCollisionBullet(Entity* entity){

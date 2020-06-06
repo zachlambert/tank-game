@@ -9,6 +9,7 @@
 struct EntityDataTank {
     double linearSpeed;
     double rotateSpeed;
+    int team;
 };
 
 struct EntityDataTurret {
@@ -24,6 +25,7 @@ struct EntityDataBullet {
     int bounces;
     double vx;
     double vy;
+    int team;
 };
 
 typedef enum{

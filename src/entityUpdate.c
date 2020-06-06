@@ -64,6 +64,8 @@ void tankShootBullet(Entity* tank, World* world, Sprite sprite){
     bullet.bullet.vx = bullet.bullet.speed * cos(bullet.pose.angle);
     bullet.bullet.vy = bullet.bullet.speed * sin(bullet.pose.angle);
     bullet.radius = 15;
+    bullet.type = BULLET;
+    bullet.bullet.team = tank->data.tank.team;
     insertEntity(&world->entities, bullet);
 }
 

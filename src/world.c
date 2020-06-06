@@ -26,7 +26,9 @@ World* initWorld(Level* level)
     player.resolveCollision = resolveCollisionTank;
     player.tank.linearSpeed = 400;
     player.tank.rotateSpeed = 5;
-    player.radius = 32;
+    player.radius = 44;
+    player.type = TANK;
+    player.tank.team = 0;
 
     Entity* entity = insertEntity(&(world->entities), player);
 
@@ -36,8 +38,9 @@ World* initWorld(Level* level)
     EntityData turret;
     turret.sprite = SPRITE_TANK_BLUE_TURRET;
     turret.turret.rotateSpeed = 8;
-    turret.turret.length = 60;
+    turret.turret.length = 100;
     turret.turret.wait = 0.2;
+    turret.type = TURRET;
 
     insertChild(entity, turret);
 
@@ -45,6 +48,7 @@ World* initWorld(Level* level)
     player.pose.x = 300;
     player.update = entityUpdateDummy;
     player.sprite = SPRITE_TANK_RED_BASE;
+    player.tank.team = 1;
     entity = insertEntity(&world->entities, player);
     turret.sprite = SPRITE_TANK_RED_TURRET;
     turret.turret.wait = 1;
