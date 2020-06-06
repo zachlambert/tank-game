@@ -6,6 +6,7 @@ Entity* insertEntity(Entity** entities, EntityData data)
 {
     Entity* newEntity = calloc(1, sizeof(Entity));
     newEntity->data = data;
+    newEntity->data.collision = NULL; // Ensure collision starts at null
     newEntity->next = *entities;
     // Used calloc, so other pointers default to 0
     *entities = newEntity;

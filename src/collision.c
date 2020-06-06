@@ -1,21 +1,10 @@
 
 #include "collision.h"
+#include "entity.h"
 #include "level.h"
+#include "world.h"
 #include <stdbool.h>
 
-typedef struct{
-    Entity* first;
-    Entity* second; // Leave null for level
-    double x;
-    double y;
-    double normalX;
-    double normalY;
-}CollisionData;
-
-typedef struct Collision{
-    struct Collision* next;
-    CollisionData data;
-}Collision;
 
 void addCollision(
     Collision** prev,
@@ -23,83 +12,19 @@ void addCollision(
 {
     Collision* collision = malloc(sizeof(Collision));
     collision->data = *data;
-    if(*prev != NULL){
-        (*prev)->next = collision;
-    }else{
-        *prev = collision;
-    }
+    collision->next = *prev;
+    *prev = collision;
 }
 
-bool checkTileCollision(
-    Entity* entity,
-    Level* level,
-    int x, int y,
-    CollisionData* data)
-{
-    // Set data to default values
-    data->x = entity->data.pose.x;
-    data->y = entity->data.pose.y;
-    data->normalX = 0;
-    data->normalY = 0;
-    // Find tile covered by entity centre 
-    int centreX, centreY;
-    centreX = floor(entity->data.pose.x / level->tileWidth);
-    centreY = floor(entity->data.pose.y / level->tileHeight);
-    //Collision with axis-aligned edges
-    if(x == centreX || y == centreY){
-        if(x < centreX){ // Left
-            data->x -= entity->data.radius;
-            data->normalX = -1;
-        }else if(x > centreX){ // Right
-            data->x += entity->data.radius;
-            data->normalX = 1;
-        }else if(y < centreY){ // Above
-            data->y -= entity->data.radius;
-            data->normalY = -1;
-        }else if(y > centreY){ // Below
-            data->y += entity->data.radius;
-            data->normalY = 1;
-        }else{ // Inside a tile
-            // Leave collision point at entity centre
-            data->normalX =
-                (double)(x*level->tileWidth + level->tileWidth/2)
-                - entity->data.pose.x;
-            data->normalY =
-                (double)(y*level->tileHeight + level->tileHeight/2)
-                - entity->data.pose.y;
-            // Normalise
-            double mag = hypot(data->normalX, data->normalY);
-            data->normalX/=mag;
-            data->normalY/=mag;
-        }
-        return true;
-    }else{
-        // Check if the nearest corner is within range
-        double cornerX, cornerY;
-        if(x<centreX){ // Left
-            cornerX = x*level->tileWidth;
-        }else{ // Right
-            cornerX = (x+1)*level->tileWidth;
-        }
-        if(y<centreY){ // Left
-            cornerY = y*level->tileHeight;
-        }else{ // Right
-            cornerY = (y+1)*level->tileHeight;
-        }
-        double dist = hypot(
-            cornerX - entity->data.pose.x,
-            cornerY - entity->data.pose.y);
-        return (dist < entity->data.radius);
-    }
-}
 
-void findCollisionEntityLevel(
+void findLevelCollisions(
     Entity* entity,
     Level* level,
     Collision** collision)
 {
     // Check it has a bounding circle
     if(entity->data.radius == 0) return;
+
     // Tiles covered by the bounding box
     int bx1, by1, bx2, by2;
     bx1 = floor((entity->data.pose.x - entity->data.radius) / level->tileWidth);
@@ -107,19 +32,86 @@ void findCollisionEntityLevel(
     bx2 = floor((entity->data.pose.x + entity->data.radius) / level->tileWidth);
     by2 = floor((entity->data.pose.y + entity->data.radius) / level->tileWidth);
 
+    // Tile covered by entity centre
+    int centreX, centreY;
+    centreX = floor(entity->data.pose.x / level->tileWidth);
+    centreY = floor(entity->data.pose.y / level->tileHeight);
+
     // Create a collisionData object to put data into
     CollisionData data;
     data.first = entity;
     data.second = NULL;
+
+    //First, check the tiles aligned to the centre
+    // Horizontal
+    printf("%c\n", getLevelTile(level, bx1, centreY));
+    if(getLevelTile(level, bx1, centreY) != '0'){
+        data.x = (bx1+1)*level->tileWidth;
+        data.y = entity->data.pose.y;
+        data.normalX = -1;
+        data.normalY = 0;
+        addCollision(collision, &data);
+    }else if(getLevelTile(level, bx2, centreY) != '0'){
+        data.x = bx2*level->tileWidth;
+        data.y = entity->data.pose.y;
+        data.normalX = 1;
+        data.normalY = 0;
+        addCollision(collision, &data);
+    }
+    // Vertical 
+    if(getLevelTile(level, centreX, by1) != '0'){
+        data.x = entity->data.pose.x;
+        data.y = (by1+1)*level->tileHeight;
+        data.normalX = 0;
+        data.normalY = -1;
+        addCollision(collision, &data);
+    }else if(getLevelTile(level, centreX, by2) != '0'){
+        data.x = entity->data.pose.x;
+        data.y = by2*level->tileHeight;
+        data.normalX = 0;
+        data.normalY = 1;
+        addCollision(collision, &data);
+    }
+
+    // Check corners
+
     // Iterative over tiles
+    double dist, dx, dy;
+    int offsetX, offsetY; // For checking that neighbouring tiles are empty
     for(int y = by1; y<=by2; y++){
         for(int x = bx1; x<=bx2; x++){
             // Make sure the tile is in range
             if(x<0 || y<0 || x>=level->width || y>=level->height) continue;
+            // Skip non-corner tiles
+            if(x==centreX || y==centreY) continue;
             // Skip if the tile is empty
-            if(level->data[y*level->width + x] == '0') continue;
+            if(getLevelTile(level, x, y) == '0') continue;
+
             // Otherwise, check for collision with this tile
-            if(checkTileCollision(entity, level, x, y, &data)){
+            // It needs to be a corner, so the neighbouring tiles are empty
+ 
+            if(x<centreX){ // Left
+                data.x = (x+1)*level->tileWidth;
+                offsetX=1;
+            }else{ // Right
+                data.x = x*level->tileWidth;
+                offsetX=-1;
+            }
+            if(y<centreY){ // Above
+                data.y = (y+1)*level->tileHeight;
+                offsetY=1;
+            }else{ // Below
+                data.y = y*level->tileHeight;
+                offsetY=-1;
+            }
+            if(getLevelTile(level, x+offsetX, y)!='0' ||
+               getLevelTile(level, x, y+offsetY)!='0') continue;
+            dx = data.x - entity->data.pose.x;
+            dx = data.y - entity->data.pose.y;
+            dist = hypot(dx, dy);
+            if(dist < entity->data.radius){
+                data.normalX = dx/dist;
+                data.normalY = dy/dist;
                 addCollision(collision, &data);
             }
         }
@@ -133,15 +125,25 @@ bool checkEntityCollision(Entity* first, Entity* second, CollisionData* data){
     if(dist > first->data.radius + second->data.radius){
         return false;
     }else{
-        data->x = first->data.pose.x + deltaX*(first->data.radius/dist);
-        data->y = first->data.pose.y + deltaY*(first->data.radius/dist);
+        double contactDist = (first->data.radius + dist - second->data.radius) / 2;
+        data->x = first->data.pose.x + deltaX*(contactDist/dist);
+        data->y = first->data.pose.y + deltaY*(contactDist/dist);
         data->normalX = deltaX/dist;
         data->normalY = deltaY/dist;
         return true;
     }
 }
 
-void resolveCollisions(World* world)
+void clearEntityCollisions(Entity* entity){
+    Collision* prev;
+    while(entity->data.collision != NULL){
+        prev = entity->data.collision;
+        entity->data.collision = entity->data.collision->next;
+        free(prev);
+    }
+}
+
+void findCollisions(World* world)
 {
     // Only looks at first-level entities for collision, other entities
     // are just cosmetic
@@ -150,7 +152,7 @@ void resolveCollisions(World* world)
     Entity* entity = world->entities;
     Collision* collision = NULL;
     while(entity != NULL){
-        findCollisionEntityLevel(entity, world->level, &collision);
+        findLevelCollisions(entity, world->level, &collision);
         entity = entity->next;
     }
     // Find entity-entity collisions
@@ -170,17 +172,22 @@ void resolveCollisions(World* world)
         first = first->next;
     }
 
-
-    // Resolve the collisions
+    // Pass the collision information to the entities
     Collision* prev;
-    if(collision != NULL){
-        // Process the collision: todo
-        printf(
-            "ENTITY-%s (%f, %f) norm (%f, %f)\n",
-            (collision->data.second?"ENTITY":"TILE"),
-            collision->data.x, collision->data.y,
-            collision->data.normalX, collision->data.normalY
-        );
+    while(collision != NULL){
+        if(collision->data.first){
+            addCollision(
+                &collision->data.first->data.collision,
+                &collision->data);
+        }
+        if(collision->data.second){
+            Entity* temp = collision->data.first;
+            collision->data.first = collision->data.second;
+            collision->data.second = temp;
+            addCollision(
+                &collision->data.first->data.collision,
+                &collision->data);
+        }
         prev = collision;
         collision = collision->next;
         free(prev);

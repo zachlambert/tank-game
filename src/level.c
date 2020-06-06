@@ -42,3 +42,7 @@ Level* initLevels(void){
     levels[0] = getLevel("levels/level1.txt");
     return levels;
 }
+
+char getLevelTile(Level* level, size_t x, size_t y){
+    return level->data[level->width*y + x];
+}

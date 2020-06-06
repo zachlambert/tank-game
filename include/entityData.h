@@ -4,6 +4,7 @@
 #include "pose.h"
 #include "sprite.h"
 #include "input.h"
+#include "collision.h"
 
 struct EntityDataTank {
     double linearSpeed;
@@ -14,7 +15,7 @@ struct EntityDataTurret {
     double rotateSpeed;
 };
 
-struct Entity; // Forward declare, since all that is needed
+struct Entity; // Forward declare only need the pointer
 typedef int (*EntityUpdate)(struct Entity*, Input*, double);
 
 typedef struct {
@@ -27,6 +28,8 @@ typedef struct {
         struct EntityDataTank tank;
         struct EntityDataTurret turret;
     };
+    Collision* collision;
+
 } EntityData;
 
 #endif

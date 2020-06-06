@@ -94,6 +94,31 @@ void drawSprite(
     }
 }
 
+void drawCollisionInformation(SDL_Renderer* renderer, Entity* entity){
+    // Draw collision points
+    Collision* collision = entity->data.collision;
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+    while(collision){
+        SDL_RenderDrawLine(
+            renderer,
+            entity->data.pose.x, entity->data.pose.y,
+            collision->data.x, collision->data.y);
+        collision = collision->next;
+    }
+    // Draw a rough circle
+    double angle = 0;
+    double deltaAngle = PI/8;
+    while(angle<2*PI){
+        SDL_RenderDrawLine(
+            renderer,
+            entity->data.pose.x + entity->data.radius*cos(angle),
+            entity->data.pose.y + entity->data.radius*sin(angle),
+            entity->data.pose.x + entity->data.radius*cos(angle+deltaAngle),
+            entity->data.pose.y + entity->data.radius*sin(angle+deltaAngle));
+        angle+=deltaAngle;
+    }
+}
+
 void drawEntities(
     SDL_Renderer* renderer,
     Entity* entity,
@@ -107,6 +132,8 @@ void drawEntities(
             // Won't be many layers, recursion probably fine.
             // Can change later if necessary
         }
+        drawCollisionInformation(renderer, entity);
+        // Next
         entity = entity->next;
     }
 }

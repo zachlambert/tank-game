@@ -2,6 +2,7 @@
 #include "entityUpdate.h"
 #include <stdbool.h>
 #include "mathDefines.h"
+#include "collisionResolve.h"
 
 void updateTank(
     Entity* tank,
@@ -9,8 +10,10 @@ void updateTank(
     double angularVelocity,
     double dt)
 {
-    // Update tank pose
+    // If there was a previous collision, move out of collision
+    moveOutOfCollision(tank);
 
+    // Update tank pose
     tank->data.pose.x += dt * linearVelocity * cos(tank->data.pose.angle);
     tank->data.pose.y += dt * linearVelocity * sin(tank->data.pose.angle);
     tank->data.pose.angle += dt * angularVelocity;
