@@ -33,8 +33,8 @@ void createPlayer(World* world, double x, double y)
     EntityData turret;
     turret.sprite = SPRITE_TANK_BLUE_TURRET;
     turret.turret.rotateSpeed = 8;
-    turret.turret.length = 60;
-    turret.turret.wait = 0.2;
+    turret.turret.length = 65;
+    turret.turret.wait = 0.22;
     turret.type = TURRET;
 
     world->player = insertTank(world, tank, turret);
@@ -87,11 +87,20 @@ World* initWorld(Level* level)
 
     createEnemy(world, 1400, 400, 200, 5, 1, entityUpdateEnemyCircle, 0, 0);
 
-    createEnemy(world, 1000, 425, 300, 5, 0.2, entityUpdateEnemyLine, PATH_DIR_LEFT, 900);
-    createEnemy(world, 200, 775, 300, 5, 0.2, entityUpdateEnemyLine, PATH_DIR_RIGHT, 900);
-    createEnemy(world, 1000, 1075, 300, 5, 0.2, entityUpdateEnemyLine, PATH_DIR_LEFT, 900);
+    createEnemy(world, 1000, 425, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_LEFT, 900);
+    createEnemy(world, 200, 775, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 900);
+    createEnemy(world, 1000, 1075, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_LEFT, 900);
 
-    createEnemy(world, 3000, 600, 400, 5, 0.5, entityUpdateEnemyLine, PATH_DIR_UP, 900);
+    createEnemy(world, 1890, 634, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 800);
+
+    createEnemy(world, 2850, 300, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_DOWN, 1150);
+    createEnemy(world, 3100, 1450, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_UP, 1150);
+
+    createEnemy(world, 300, 1200, 200, 5, 1, entityUpdateEnemyCircle, 0, 0);
+
+    createEnemy(world, 1300, 950, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 660);
+    createEnemy(world, 1790, 1090, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 760);
+    createEnemy(world, 2380, 960, 200, 3, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 300);
 
     // Set the camera position
     world->camera.x = 50;

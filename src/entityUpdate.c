@@ -61,10 +61,10 @@ void tankShootBullet(Entity* tank, World* world, Sprite sprite){
     bullet.sprite = sprite;
     bullet.bullet.bounces = 3;
     bullet.bullet.damage = 1;
-    bullet.bullet.speed = 800;
+    bullet.bullet.speed = 700;
     bullet.bullet.vx = bullet.bullet.speed * cos(bullet.pose.angle);
     bullet.bullet.vy = bullet.bullet.speed * sin(bullet.pose.angle);
-    bullet.radius = 15;
+    bullet.radius = 18;
     bullet.type = BULLET;
     bullet.bullet.team = tank->data.tank.team;
     insertEntity(&world->entities, bullet);
@@ -101,6 +101,7 @@ int entityUpdatePlayer(Entity* player, World* world, Input* input, double dt)
     double targetX, targetY;
     targetX = world->camera.x + ((double)mx) / world->camera.zoom;
     targetY = world->camera.y + ((double)my) / world->camera.zoom;
+    printf("[%f, %f]\n", targetX, targetY);
     pointTurret(player, targetX, targetY, dt);
 
     // Shoot bullets

@@ -40,6 +40,11 @@ int resolveCollisionBullet(Entity* entity){
     if(collision){
         if(--(entity->data.bullet.bounces) >= 0){
             while(collision){
+                if (collision->data.second
+                    && collision->data.second->data.type == BULLET
+                    && collision->data.second->data.bullet.team != entity->data.bullet.team){
+                    return 1;
+                }
                 moveOutOfCollisionSingle(entity, collision);
                 // Reflect velocity along the collision normal
                 double dist =
