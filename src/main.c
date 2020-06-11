@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     // Omitted fields are initialised to zero
     App app_obj = {
         .SCREEN_WIDTH = 1600,
-        .SCREEN_HEIGHT = 900 
+        .SCREEN_HEIGHT = 900
     };
     App* app = &app_obj;
 

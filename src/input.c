@@ -45,7 +45,7 @@ int doInput(Input* input)
 				return 1;
             case SDL_KEYDOWN:
                 if(((SDL_KeyboardEvent*)&event.key)->keysym.scancode
-                        ==SDL_SCANCODE_ESCAPE)
+                        ==SDL_SCANCODE_Q)
                     return 1;
                 setKey(input, &event.key, true);
                 break;

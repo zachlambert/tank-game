@@ -30,18 +30,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 void blit(
     SDL_Renderer* renderer,
     SDL_Texture *texture,
-    int x,
-    int y,
-    bool centre)
+    double x,
+    double y,
+    bool centre,
+    Camera* camera)
 {
     SDL_Rect dest;
-    dest.x = x;
-    dest.y = y;
     SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
     if(centre){
-        dest.x -= dest.w/2;
-        dest.y -= dest.h/2;
+        x -= dest.w/2;
+        y -= dest.h/2;
     }
+    dest.x = camera->zoom * (x - camera->x);
+    dest.y = camera->zoom * (y - camera->y);
+    dest.w *= camera->zoom;
+    dest.h *= camera->zoom;
     SDL_RenderCopy(renderer, texture, NULL, &dest);
     // Draw texture onto renderer at rectangle dst.
     // NULL is passed as the src rect to indicate the whole image.
@@ -50,25 +53,26 @@ void blit(
 void blitRegion(
     SDL_Renderer* renderer,
     SDL_Texture *texture,
-    int x,
-    int y,
+    double x,
+    double y,
     int index,
-    bool centre)
+    bool centre,
+    Camera* camera)
 {
     SDL_Rect src = {0, 0, 0, 0};
     SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
     src.w = src.h;
     src.x = src.w * index;
-    SDL_Rect dest = { 
-        x,
-        y,
-        src.w,
-        src.h
-    };
     if(centre){
-        dest.x -= dest.w/2;
-        dest.y -= dest.h/2;
+        x -= src.w/2;
+        y -= src.h/2;
     }
+    SDL_Rect dest = {
+        camera->zoom * (x - camera->x),
+        camera->zoom * (y - camera->y),
+        camera->zoom * src.w,
+        camera->zoom * src.h
+    };
     SDL_RenderCopy(renderer, texture, &src, &dest);
 }
 
@@ -77,33 +81,35 @@ void drawSprite(
         Pose pose,
         Sprite sprite,
         SpriteData* spriteData,
-        bool centre)
+        bool centre,
+        Camera* camera)
 {
     if(spriteData->textures[sprite] == NULL) return;
     if(sprite<spriteData->FIRST_ROTATION){
         blit(
             renderer, spriteData->textures[sprite],
-            (int)pose.x, (int)pose.y, centre);
+            (int)pose.x, (int)pose.y, centre, camera);
     }else{
         int index = (int)round(pose.angle/(2*PI) * spriteData->NUM_ROTATIONS);
         if(index<0) index+= spriteData->NUM_ROTATIONS;
         if(index==spriteData->NUM_ROTATIONS) index = 0;
         blitRegion(
             renderer, spriteData->textures[sprite],
-            (int)pose.x, (int)pose.y, index, centre);
+            (int)pose.x, (int)pose.y, index, centre, camera);
     }
 }
 
 void drawEntities(
     SDL_Renderer* renderer,
     Entity* entity,
-    SpriteData* spriteData)
+    SpriteData* spriteData,
+    Camera* camera)
 {
     while(entity){
         drawSprite(
-            renderer, entity->data.pose, entity->data.sprite, spriteData, true);
+            renderer, entity->data.pose, entity->data.sprite, spriteData, true, camera);
         if(entity->children){
-            drawEntities(renderer, entity->children, spriteData);
+            drawEntities(renderer, entity->children, spriteData, camera);
             // Won't be many layers, recursion probably fine.
             // Can change later if necessary
         }
@@ -121,8 +127,8 @@ void drawScene(
 	SDL_RenderClear(renderer);
 
     static Pose levelPose = {0, 0, 0};
-    drawSprite(renderer, levelPose, world->level->sprite, spriteData, false); 
-    drawEntities(renderer, world->entities, spriteData);
+    drawSprite(renderer, levelPose, world->level->sprite, spriteData, false, &world->camera); 
+    drawEntities(renderer, world->entities, spriteData, &world->camera);
 
 	SDL_RenderPresent(renderer);
 }

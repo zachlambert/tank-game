@@ -12,25 +12,38 @@ Level getLevel(char* filename){
         level.height = 0;
         return level;
     }
-    char buf[255];
-    fscanf(fp, "%s", buf);
-    size_t i = 0;
-    size_t scanReturn = 0;
-    while(scanReturn != EOF){
-        scanReturn = fscanf(fp, "%s", buf);
-        i++;
+    char read;
+    int result = 0;
+    size_t j, i;
+    j = 0;
+    result = fscanf(fp, "%c", &read);
+    printf("%c", read);
+    while (result != EOF){
+        i = 0;
+        while (read != '\n' && result != EOF){
+            ++i;
+            result = fscanf(fp, "%c", &read);
+        }
+        result = fscanf(fp, "%c", &read);
+        ++j;
     }
-    level.width = strlen(buf);
-    level.height = i;
-    level.data = malloc(level.width*level.height*sizeof(int)); 
-    i = 0;
+    level.width = i;
+    level.height = j;
+    level.data = malloc(level.width*level.height); 
+
     fclose(fp);
     fp = fopen(filename, "r");
-    scanReturn = 0;
-    while(scanReturn !=EOF){
-        scanReturn = fscanf(fp, "%s", buf);
-        memcpy(level.data + i*level.width, buf, level.width);
-        i++;
+    j = 0;
+    result = fscanf(fp, "%c", &read);
+    while(result !=EOF){
+        i = 0;
+        while (read != '\n' && result != EOF){
+            memcpy(level.data + j*level.width + i, &read, 1);
+            ++i;
+            result = fscanf(fp, "%c", &read);
+        }
+        result = fscanf(fp, "%c", &read);
+        ++j;
     }
     level.sprite = SPRITE_LEVEL;
     fclose(fp);

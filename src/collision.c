@@ -44,13 +44,13 @@ void findLevelCollisions(
 
     //First, check the tiles aligned to the centre
     // Horizontal
-    if(getLevelTile(level, bx1, centreY) != '0'){
+    if(getLevelTile(level, bx1, centreY) != ' '){
         data.x = (bx1+1)*level->tileWidth;
         data.y = entity->data.pose.y;
         data.normalX = -1;
         data.normalY = 0;
         addCollision(collision, &data);
-    }else if(getLevelTile(level, bx2, centreY) != '0'){
+    }else if(getLevelTile(level, bx2, centreY) != ' '){
         data.x = bx2*level->tileWidth;
         data.y = entity->data.pose.y;
         data.normalX = 1;
@@ -58,13 +58,13 @@ void findLevelCollisions(
         addCollision(collision, &data);
     }
     // Vertical 
-    if(getLevelTile(level, centreX, by1) != '0'){
+    if(getLevelTile(level, centreX, by1) != ' '){
         data.x = entity->data.pose.x;
         data.y = (by1+1)*level->tileHeight;
         data.normalX = 0;
         data.normalY = -1;
         addCollision(collision, &data);
-    }else if(getLevelTile(level, centreX, by2) != '0'){
+    }else if(getLevelTile(level, centreX, by2) != ' '){
         data.x = entity->data.pose.x;
         data.y = by2*level->tileHeight;
         data.normalX = 0;
@@ -82,7 +82,7 @@ void findLevelCollisions(
             // Skip non-corner tiles
             if(x==centreX || y==centreY) continue;
             // Skip if the tile is empty
-            if(getLevelTile(level, x, y) == '0') continue;
+            if(getLevelTile(level, x, y) == ' ') continue;
 
             // Otherwise, check for collision with this tile
             // It needs to be a corner, so the neighbouring tiles are empty
@@ -101,8 +101,8 @@ void findLevelCollisions(
                 data.y = y*level->tileHeight;
                 offsetY=-1;
             }
-            if(getLevelTile(level, x+offsetX, y)!='0' ||
-               getLevelTile(level, x, y+offsetY)!='0') continue;
+            if(getLevelTile(level, x+offsetX, y)!=' ' ||
+               getLevelTile(level, x, y+offsetY)!=' ') continue;
             dx = data.x - entity->data.pose.x;
             dy = data.y - entity->data.pose.y;
             dist = hypot(dx, dy);
@@ -195,4 +195,46 @@ void findCollisions(World* world)
         collision = collision->next;
         free(prev);
     }
+}
+
+// Check if there is a line of sight between the two entities
+bool checkSight(struct World* world, struct Entity* a, struct Entity* b)
+{
+    if (fabs(b->data.pose.x - a->data.pose.x) > fabs(b->data.pose.y - a->data.pose.y)) {
+        // Iterate over columns (x)
+        int ax = floor(a->data.pose.x / world->level->tileWidth);
+        int bx = floor(b->data.pose.x / world->level->tileWidth);
+        int dx = ax < bx ? 1 : -1;        
+        double fx, fy;
+        int y;
+        for (int x = ax; x != bx; x += dx) {
+            fx = x * world->level->tileWidth + 0.5 * world->level->tileWidth;
+            fy = a->data.pose.y
+                 + (b->data.pose.y - a->data.pose.y)
+                   * (fx - a->data.pose.x) / (b->data.pose.x - a->data.pose.x);
+            y = floor(fy / world->level->tileWidth);
+            if (getLevelTile(world->level, x, y) != ' ') {
+                return false;
+            }
+        }
+
+    } else {
+        // Iterate over rows (y)
+        int ay = floor(a->data.pose.y / world->level->tileHeight);
+        int by = floor(b->data.pose.y / world->level->tileHeight);
+        int dy = ay < by ? 1 : -1;        
+        double fx, fy;
+        int x;
+        for (int y = ay; y != by; y += dy) {
+            fy = y * world->level->tileHeight + 0.5 * world->level->tileHeight;
+            fx = a->data.pose.x
+                 + (b->data.pose.x - a->data.pose.x)
+                   * (fy - a->data.pose.y) / (b->data.pose.y - a->data.pose.y);
+            x = floor(fx / world->level->tileWidth);
+            if (getLevelTile(world->level, x, y) != ' ') {
+                return false;
+            }
+        }
+    }
+    return true;
 }

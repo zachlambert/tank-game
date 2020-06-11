@@ -2,6 +2,7 @@
 #include "entityUpdate.h"
 #include <stdbool.h>
 #include "mathDefines.h"
+#include "collision.h"
 #include "resolveCollision.h"
 #include "world.h"
 
@@ -58,7 +59,7 @@ void tankShootBullet(Entity* tank, World* world, Sprite sprite){
     bullet.resolveCollision = resolveCollisionBullet;
     bullet.collision = NULL;
     bullet.sprite = sprite;
-    bullet.bullet.bounces = 5;
+    bullet.bullet.bounces = 3;
     bullet.bullet.damage = 1;
     bullet.bullet.speed = 800;
     bullet.bullet.vx = bullet.bullet.speed * cos(bullet.pose.angle);
@@ -97,7 +98,10 @@ int entityUpdatePlayer(Entity* player, World* world, Input* input, double dt)
     int mx, my;
     SDL_GetMouseState(&mx, &my);
     updateTank(player, linearVelocity, angularVelocity, dt);
-    pointTurret(player, (double)mx, (double)my, dt);
+    double targetX, targetY;
+    targetX = world->camera.x + ((double)mx) / world->camera.zoom;
+    targetY = world->camera.y + ((double)my) / world->camera.zoom;
+    pointTurret(player, targetX, targetY, dt);
 
     // Shoot bullets
     if(input->mouse){
@@ -106,17 +110,81 @@ int entityUpdatePlayer(Entity* player, World* world, Input* input, double dt)
     return 0;
 }
 
-int entityUpdateDummy(Entity* entity, World* world, Input* input, double dt)
+int entityUpdateEnemyCircle(Entity* entity, World* world, Input* input, double dt)
 {
     updateTank(entity, 200, 2, dt);
-    pointTurret(
-        entity,
-        world->player->data.pose.x,
-        world->player->data.pose.y,
-        dt
-    );
-    tankShootBullet(entity, world, SPRITE_BULLET_RED);
+    if (world->player) {
+        if (checkSight(world, world->player, entity)) {
+            pointTurret(
+                entity,
+                world->player->data.pose.x,
+                world->player->data.pose.y,
+                dt
+            );
+            tankShootBullet(entity, world, SPRITE_BULLET_RED);
+        }
+    }
     return 0;
 }
 
-
+int entityUpdateEnemyLine(Entity* entity, World* world, Input* input, double dt)
+{
+    EntityDataPath* path = &entity->data.tank.path;
+    if (path->state == -1) { // Initial state
+        entity->data.pose.angle = PI/2 * path->dir; 
+        path->state = 0;
+    }
+    switch (path->state) {
+    case 0:
+        updateTank(entity, entity->data.tank.linearSpeed, 0, dt);
+        path->coord += entity->data.tank.linearSpeed * dt;
+        if (path->coord > path->length) {
+            path->state = 1;
+            path->coord = 0;
+        }
+        break;
+    case 1:
+        updateTank(entity, 0, entity->data.tank.rotateSpeed, dt);
+        path->coord += entity->data.tank.rotateSpeed * dt;
+        if (path->coord > PI) {
+            path->state = 2;
+            path->coord = 0;
+            entity->data.pose.angle = PI/2 * (2 + path->dir);
+        }
+        break;
+    case 2:
+        updateTank(entity, entity->data.tank.linearSpeed, 0, dt);
+        path->coord += entity->data.tank.linearSpeed * dt;
+        if (path->coord > path->length) {
+            path->state = 3;
+            path->coord = 0;
+        }
+        break;
+    case 3:
+        updateTank(entity, 0, entity->data.tank.rotateSpeed, dt);
+        path->coord += entity->data.tank.rotateSpeed * dt;
+        if (path->coord > PI) {
+            path->state = 0;
+            path->coord = 0;
+            entity->data.pose.angle = PI/2 * path->dir; 
+        }
+        break;
+    default:
+        break;
+    }
+    if (entity->data.pose.angle > PI) {
+        entity->data.pose.angle -= 2*PI;
+    }
+    if (world->player) {
+        if (checkSight(world, world->player, entity)) {
+            pointTurret(
+                entity,
+                world->player->data.pose.x,
+                world->player->data.pose.y,
+                dt
+            );
+            tankShootBullet(entity, world, SPRITE_BULLET_RED);
+        }
+    }
+    return 0;
+}

@@ -83,9 +83,9 @@ void runApp(App* app){
         prev = now;
         now = SDL_GetPerformanceCounter();
         dt = (double)(now-prev) * timeScaleFactor;
-        updateWorld(app->world, app->input, dt);
+        updateWorld(app->world, app->input, dt, app->SCREEN_WIDTH, app->SCREEN_HEIGHT);
 		drawScene(app->renderer, app->world, app->spriteData);
-		SDL_Delay(16); // Wait an arbitrary(ish) number of milliseconds
+		// SDL_Delay(16); // Wait an arbitrary(ish) number of milliseconds
         // All this does it cap the framerate at ~60
 	}
 }

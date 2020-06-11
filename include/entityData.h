@@ -6,10 +6,25 @@
 #include "input.h"
 #include "collision.h"
 
+typedef enum {
+    PATH_DIR_RIGHT,
+    PATH_DIR_DOWN,
+    PATH_DIR_LEFT,
+    PATH_DIR_UP
+} EntityDataPathDir;
+
+typedef struct {
+    int state;
+    double coord;
+    double length;
+    EntityDataPathDir dir;
+} EntityDataPath;
+
 struct EntityDataTank {
     double linearSpeed;
     double rotateSpeed;
     int team;
+    EntityDataPath path; // Only used by line enemies
 };
 
 struct EntityDataTurret {
