@@ -1,3 +1,3 @@
 Here is a screenshot.
-![Screenshot]
-(screenshot.png)
+
+![Screenshot](screenshot.png)
