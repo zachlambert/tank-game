@@ -17,7 +17,6 @@ Level getLevel(char* filename){
     size_t j, i;
     j = 0;
     result = fscanf(fp, "%c", &read);
-    printf("%c", read);
     while (result != EOF){
         i = 0;
         while (read != '\n' && result != EOF){

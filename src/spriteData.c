@@ -45,7 +45,6 @@ SDL_Texture* loadLevelTexture(SDL_Renderer* renderer, char* filename, Level* lev
 	SDL_RenderClear(renderer);
 
     size_t index;
-    printf("%li, %li\n", level->width, level->height);
     for(size_t j=0; j<level->height; j++){
         for(size_t i=0; i<level->width; i++){
             index = j*level->width + i; 

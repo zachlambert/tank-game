@@ -34,7 +34,7 @@ void createPlayer(World* world, double x, double y)
     turret.sprite = SPRITE_TANK_BLUE_TURRET;
     turret.turret.rotateSpeed = 8;
     turret.turret.length = 65;
-    turret.turret.wait = 0.22;
+    turret.turret.wait = 0.4;
     turret.type = TURRET;
 
     world->player = insertTank(world, tank, turret);
@@ -67,7 +67,7 @@ void createEnemy(
     EntityData turret;
     turret.sprite = SPRITE_TANK_RED_TURRET;
     turret.turret.rotateSpeed = 8;
-    turret.turret.length = 60;
+    turret.turret.length = 65;
     turret.turret.wait = wait;
     turret.type = TURRET;
 
@@ -85,7 +85,7 @@ World* initWorld(Level* level)
 
     createPlayer(world, 200, 200);
 
-    createEnemy(world, 1400, 400, 200, 5, 1, entityUpdateEnemyCircle, 0, 0);
+    createEnemy(world, 1400, 400, 200, 2, 1, entityUpdateEnemyCircle, 0, 0);
 
     createEnemy(world, 1000, 425, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_LEFT, 900);
     createEnemy(world, 200, 775, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 900);
@@ -93,19 +93,33 @@ World* initWorld(Level* level)
 
     createEnemy(world, 1890, 634, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 800);
 
-    createEnemy(world, 2850, 300, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_DOWN, 1150);
-    createEnemy(world, 3100, 1450, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_UP, 1150);
+    createEnemy(world, 2950, 300, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_DOWN, 1150);
+    createEnemy(world, 3150, 1450, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_UP, 1150);
 
-    createEnemy(world, 300, 1200, 200, 5, 1, entityUpdateEnemyCircle, 0, 0);
+    createEnemy(world, 300, 1200, 300, 3, 1, entityUpdateEnemyCircle, 0, 0);
 
     createEnemy(world, 1300, 950, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 660);
     createEnemy(world, 1790, 1090, 300, 5, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 760);
     createEnemy(world, 2380, 960, 200, 3, 0.6, entityUpdateEnemyLine, PATH_DIR_RIGHT, 300);
 
+    createEnemy(world, 644, 1730, 200, 1.5, 0.4, entityUpdateEnemyCircle, 0, 0);
+    createEnemy(world, 1150, 1730, 200, 1.5, 0.4, entityUpdateEnemyCircle, 0, 0);
+    createEnemy(world, 1658, 1730, 200, 1.5, 0.4, entityUpdateEnemyCircle, 0, 0);
+    createEnemy(world, 2180, 1730, 200, 1.5, 0.4, entityUpdateEnemyCircle, 0, 0);
+    createEnemy(world, 2686, 1730, 200, 1.5, 0.4, entityUpdateEnemyCircle, 0, 0);
+
+    createEnemy(world, 208, 1678, 275.02, 4, 0.3, entityUpdateEnemyLine, PATH_DIR_DOWN, 360);
+    createEnemy(world, 3200, 1678, 275.02, 4, 0.3, entityUpdateEnemyLine, PATH_DIR_DOWN, 360);
+
+    createEnemy(world, 580, 1490, 200, 4, 0.5, entityUpdateEnemyLine, PATH_DIR_RIGHT, 900);
+    createEnemy(world, 1860, 1490, 200, 4, 0.5, entityUpdateEnemyLine, PATH_DIR_RIGHT, 900);
+    createEnemy(world, 2760, 1290, 200, 4, 0.5, entityUpdateEnemyLine, PATH_DIR_LEFT, 900);
+    createEnemy(world, 1480, 1290, 200, 4, 0.5, entityUpdateEnemyLine, PATH_DIR_LEFT, 900);
+
     // Set the camera position
-    world->camera.x = 50;
-    world->camera.y = 100;
-    world->camera.zoom = 0.5;
+    world->camera.x = 0;
+    world->camera.y = 0;
+    world->camera.zoom = 0.6;
 
     return world;
 }

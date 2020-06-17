@@ -59,9 +59,9 @@ void tankShootBullet(Entity* tank, World* world, Sprite sprite){
     bullet.resolveCollision = resolveCollisionBullet;
     bullet.collision = NULL;
     bullet.sprite = sprite;
-    bullet.bullet.bounces = 3;
+    bullet.bullet.bounces = 1;
     bullet.bullet.damage = 1;
-    bullet.bullet.speed = 700;
+    bullet.bullet.speed = 800;
     bullet.bullet.vx = bullet.bullet.speed * cos(bullet.pose.angle);
     bullet.bullet.vy = bullet.bullet.speed * sin(bullet.pose.angle);
     bullet.radius = 18;
@@ -101,7 +101,6 @@ int entityUpdatePlayer(Entity* player, World* world, Input* input, double dt)
     double targetX, targetY;
     targetX = world->camera.x + ((double)mx) / world->camera.zoom;
     targetY = world->camera.y + ((double)my) / world->camera.zoom;
-    printf("[%f, %f]\n", targetX, targetY);
     pointTurret(player, targetX, targetY, dt);
 
     // Shoot bullets
@@ -113,7 +112,7 @@ int entityUpdatePlayer(Entity* player, World* world, Input* input, double dt)
 
 int entityUpdateEnemyCircle(Entity* entity, World* world, Input* input, double dt)
 {
-    updateTank(entity, 200, 2, dt);
+    updateTank(entity, entity->data.tank.linearSpeed, entity->data.tank.rotateSpeed, dt);
     if (world->player) {
         if (checkSight(world, world->player, entity)) {
             pointTurret(
@@ -123,8 +122,10 @@ int entityUpdateEnemyCircle(Entity* entity, World* world, Input* input, double d
                 dt
             );
             tankShootBullet(entity, world, SPRITE_BULLET_RED);
+            return 0;
         }
     }
+    entity->children->data.pose.angle = entity->data.pose.angle;
     return 0;
 }
 
@@ -185,7 +186,9 @@ int entityUpdateEnemyLine(Entity* entity, World* world, Input* input, double dt)
                 dt
             );
             tankShootBullet(entity, world, SPRITE_BULLET_RED);
+            return 0;
         }
     }
+    entity->children->data.pose.angle = entity->data.pose.angle;
     return 0;
 }
